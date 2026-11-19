@@ -33,14 +33,16 @@ jobs:
       - name: Sincronizar Capacitor Android
         run: npx cap sync android
 
-      - name: Dar permisos y compilar APK Debug
+      - name: Compilar y renombrar APK Debug
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+          mkdir -p ../apk-out
+          cp app/build/outputs/apk/debug/app-debug.apk ../apk-out/COLOR-DASH-v0.2.0.apk
 
-      - name: Subir APK como artefacto descargable
+      - name: Subir APK renombrado como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: color-dash-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: COLOR-DASH-APK-v0.2.0
+          path: apk-out/COLOR-DASH-v0.2.0.apk

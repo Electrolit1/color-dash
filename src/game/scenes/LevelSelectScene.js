@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import createMenuButton from '../ui/createMenuButton.js';
 import drawColorfulBackground from '../ui/drawColorfulBackground.js';
+import { STAGE_CONFIGS } from './stages/stageConfigs.js';
 
-const LEVEL_COUNT = 5;
+const LEVEL_COUNT = STAGE_CONFIGS.length;
 const LEVEL_POSITIONS = [88, 244, 400, 556, 712];
 const STAR_POSITIONS = [-20, 0, 20];
 
@@ -28,7 +29,7 @@ export default class LevelSelectScene extends Phaser.Scene {
       strokeThickness: 8,
     }).setOrigin(0.5);
 
-    this.add.text(400, 109, 'Completa cada nivel para desbloquear el siguiente', {
+    this.add.text(400, 109, 'Cinco mundos, peligros y dificultad creciente', {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '16px',
       fontStyle: 'bold',
@@ -62,6 +63,7 @@ export default class LevelSelectScene extends Phaser.Scene {
   createLevelNodes() {
     for (let levelId = 1; levelId <= LEVEL_COUNT; levelId++) {
       const unlocked = levelId <= this.highestUnlockedLevel;
+      const stageConfig = STAGE_CONFIGS[levelId - 1];
       const savedStars = Number(localStorage.getItem(`colorDashLevel${levelId}Stars`) ?? 0);
       const earnedStars = unlocked && Number.isFinite(savedStars)
         ? Phaser.Math.Clamp(Math.floor(savedStars), 0, 3)
@@ -107,18 +109,32 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.showLockedMessage(levelId);
       });
 
-      this.add.text(x, 278, `NIVEL ${levelId}`, {
+      this.add.text(x, 274, `NIVEL ${levelId}`, {
         fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
         fontSize: '13px',
         fontStyle: 'bold',
         color: unlocked ? '#5528a8' : '#687b88',
       }).setOrigin(0.5);
 
+      this.add.text(x, 293, stageConfig.shortName, {
+        fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
+        fontSize: '10px',
+        fontStyle: 'bold',
+        color: unlocked ? '#3e6380' : '#687b88',
+      }).setOrigin(0.5);
+
       STAR_POSITIONS.forEach((offset, index) => {
-        this.add.star(x + offset, 310, 5, 5, 11, 0xffc83d)
+        this.add.star(x + offset, 316, 5, 5, 11, 0xffc83d)
           .setStrokeStyle(1, 0x9d8042, 0.7)
           .setAlpha(index < earnedStars ? 1 : 0.42);
       });
+
+      this.add.text(x, 338, `${stageConfig.difficulty}${stageConfig.mode === 'night' ? ' · NOCHE' : ''}`, {
+        fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
+        fontSize: '9px',
+        fontStyle: 'bold',
+        color: stageConfig.mode === 'night' ? '#4c4a83' : '#3e6380',
+      }).setOrigin(0.5);
     }
   }
 

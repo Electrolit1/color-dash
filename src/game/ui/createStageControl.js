@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export default function createStage1Control(
+export default function createStageControl(
   scene,
   { x, label, color, onPress, onRelease, width = 148 },
 ) {

@@ -27,6 +27,8 @@ Guarda en `sfx/`:
 - `coin.wav`: moneda, 0.15–0.5 segundos.
 - `star.wav`: estrella, 0.4–0.9 segundos.
 - `collision.wav`: choque suave, 0.3–1.2 segundos.
+- `night-bird.wav`: llamada nocturna original que suena al pasar murciélagos y criaturas nocturnas,
+  aproximadamente 1 segundo.
 
 Formato recomendado: WAV PCM, 16 bits, mono, 44.1 kHz. Recorta el silencio
 al principio y final de cada efecto.
@@ -35,4 +37,4 @@ Después de copiar los archivos, reinicia o recarga el juego. La música se
 reproduce en bucle; el control de carga y el botón de configuración activan o
 silencian la música, y los efectos se controlan por separado. El clic ya está
 conectado a todos los botones. Los
-efectos de salto, moneda, estrella y choque están listos para las mecánicas futuras.
+efectos de salto, moneda, estrella, choque y ave nocturna ya están conectados a sus eventos.

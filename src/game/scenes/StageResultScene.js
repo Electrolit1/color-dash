@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import createMenuButton from '../ui/createMenuButton.js';
 import drawColorfulBackground from '../ui/drawColorfulBackground.js';
+import { STAGE_CONFIGS } from './stages/stageConfigs.js';
 
 const BEST_SCORE_KEY = 'colorDashBestScore';
-const LEVEL_COUNT = 5;
+const LEVEL_COUNT = STAGE_CONFIGS.length;
 
 export default class StageResultScene extends Phaser.Scene {
   constructor() {
@@ -15,6 +16,9 @@ export default class StageResultScene extends Phaser.Scene {
     const levelId = Number.isInteger(data.levelId) && data.levelId > 0
       ? data.levelId
       : 1;
+    const stageName = typeof data.stageName === 'string'
+      ? data.stageName
+      : (STAGE_CONFIGS[levelId - 1]?.name ?? 'COLOR DASH');
     const score = this.safeCount(data.score);
     const coins = this.safeCount(data.collectedCoins);
     const totalCoins = this.safeCount(data.totalCoins);
@@ -43,16 +47,22 @@ export default class StageResultScene extends Phaser.Scene {
     }
 
     drawColorfulBackground(this);
-    this.add.text(400, 63, outcome === 'victory' ? '¡NIVEL COMPLETADO!' : '¡FIN DE LA CARRERA!', {
+    const title = outcome === 'victory'
+      ? levelId === LEVEL_COUNT ? '¡AVENTURA COMPLETADA!' : '¡NIVEL COMPLETADO!'
+      : '¡FIN DE LA CARRERA!';
+    this.add.text(400, 63, title, {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
-      fontSize: outcome === 'victory' ? '36px' : '34px',
+      fontSize: outcome === 'victory' && levelId === LEVEL_COUNT ? '31px' : '34px',
       fontStyle: 'bold',
       color: outcome === 'victory' ? '#358b4d' : '#5528a8',
       stroke: '#ffffff',
       strokeThickness: 8,
     }).setOrigin(0.5);
 
-    this.add.text(400, 108, outcome === 'victory' ? 'PRADERA SOLEADA' : '¡INTÉNTALO OTRA VEZ!', {
+    const subtitle = outcome === 'victory'
+      ? levelId === LEVEL_COUNT ? '¡LOS CINCO MUNDOS ESTÁN A SALVO!' : stageName
+      : '¡INTÉNTALO OTRA VEZ!';
+    this.add.text(400, 108, subtitle, {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '17px',
       fontStyle: 'bold',

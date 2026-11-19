@@ -21,6 +21,7 @@ const AUDIO_KEYS = new Map([
   ['/src/assets/audio/sfx/coin.wav', 'coin'],
   ['/src/assets/audio/sfx/star.wav', 'star'],
   ['/src/assets/audio/sfx/collision.wav', 'collision'],
+  ['/src/assets/audio/sfx/night-bird.wav', 'nightBird'],
 ]);
 
 export default class PreloadScene extends Phaser.Scene {

@@ -1,7 +1,7 @@
 # COLOR DASH
 
-Base del proyecto de videojuego COLOR DASH. Vite sirve la aplicación y Phaser 3
-renderiza el menú, la selección de niveles y el Nivel 1 jugable.
+Videojuego arcade COLOR DASH desarrollado con Phaser 3 y Vite. Incluye cinco
+niveles jugables con progresión, puntuación, coleccionables, peligros y final de aventura.
 
 ## Requisitos
 
@@ -31,14 +31,19 @@ npm run preview
 - Escalado: `FIT` con centrado automático, manteniendo la proporción 16:9.
 - Escenas: `BootScene` inicia `PreloadScene`, que lleva a `MenuScene`.
 - El menú incluye accesos a selección de niveles, personajes, récords y configuración.
-- Al elegir **JUGAR**, se abre una fila horizontal con cinco niveles. El nivel 1 está
-  desbloqueado inicialmente; los niveles 2–5 indican que hay que completar el nivel anterior.
-- Al seleccionar el nivel 1, `GameScene` deriva a `Stage1Scene`, con un recorrido de unos
-  48 segundos dividido en tres tramos y una meta.
-- Completar un nivel desbloquea el siguiente y ofrece una transición directa. Los niveles
-  2–5 aún muestran una escena provisional hasta que tengan su propio contenido.
-- El Nivel 1 permite saltar, hacer un doble salto en el aire y agacharse; cuenta con
-  controles táctiles y teclado. Cada salto consume energía, que se recupera al tocar el suelo.
+- Al elegir **JUGAR**, se abre el mapa de cinco mundos. El nivel 1 está desbloqueado
+  inicialmente; cada victoria desbloquea el siguiente y permite continuar directamente.
+- `GameScene` usa `StageScene` y configuraciones independientes para los cinco recorridos:
+  Pradera Soleada, Mundo de Dulces, Reino de Nieve, Playa Tropical y Mundo Espacial.
+- Cada recorrido dura aproximadamente 48–50 segundos, contiene tres tramos, coleccionables,
+  peligros y una meta. La velocidad y los peligros aumentan en cada nivel.
+- Los niveles 2, 3 y 5 ocurren de noche; el 4 usa un ambiente de atardecer. Los murciélagos,
+  búhos y criaturas nocturnas emiten una llamada original al pasar junto al jugador.
+- En todos los niveles se puede saltar, hacer un doble salto en el aire y agacharse, con
+  teclado o controles táctiles. Cada salto consume energía, que se recupera al tocar el suelo;
+  las baterías de energía ayudan a recargarla.
+- Los escudos protegen de un choque; rocas, pinchos, olas, carámbanos, láseres, aves y meteoros
+  tienen colisiones propias. Los huecos aparecen desde el nivel 2; el nivel inicial no tiene.
 - En **PERSONAJES** se puede elegir gato, perro o conejo. La selección se guarda en
   `colorDashSelectedCharacter` y aparece al jugar.
 - La escena de carga muestra el avance de los recursos y usa una música propia; el botón
@@ -46,15 +51,11 @@ npm run preview
 - **VESTIMENTA** abre una pantalla provisional para futuros gorros, gafas y accesorios.
 - Las monedas aumentan la puntuación y los orbes de color duplican temporalmente los puntos
   de distancia. La mejor puntuación se guarda en `colorDashBestScore`.
-- Al completar el nivel se otorga una estrella; se obtiene otra con al menos un 70% de las
-  monedas; la tercera requiere al menos un 90% y terminar sin golpes. Se puede reintentar
-  para mejorar la marca; completar el nivel desbloquea el siguiente aunque no se obtengan
-  tres estrellas. Las marcas se guardan en `colorDashLevel1Stars` y el nivel desbloqueado en
-  `colorDashUnlockedLevel`.
-- Los choques con obstáculos o aves que vuelan en sentido contrario terminan la carrera.
-  El Nivel 1 no contiene huecos; el sistema de huecos queda disponible para etapas futuras.
-- Durante el Nivel 1, **PAUSAR**, `Esc` o `P` abre la pausa para reanudar, reiniciar, cambiar
-  música/efectos o volver al menú.
+- Al completar un nivel se obtiene una estrella; las otras dependen de la proporción de monedas
+  y de terminar sin golpes. Cada recorrido configura sus propios umbrales. Se puede reintentar
+  para mejorar la marca; las estrellas por nivel y el progreso se guardan localmente.
+- Completar el nivel 5 muestra el cierre de la aventura. **PAUSAR**, `Esc` o `P` funciona en
+  todos los niveles y permite reanudar, reiniciar, cambiar música/efectos o volver al menú.
 - Las preferencias de música y efectos se guardan bajo `colorDashAudioPreferences`.
 - `AudioManager` reproduce los archivos compatibles agregados en `src/assets/audio/`.
 - Consulta `src/assets/audio/README.md` para nombres, formatos y duraciones recomendados.
@@ -62,19 +63,18 @@ npm run preview
   mostrará 0 si no existe un récord guardado.
 - Los personajes decorativos son ilustraciones vectoriales creadas con Phaser.
 
-## Probar el Nivel 1
+## Probar los niveles
 
 1. Ejecuta `npm run dev` y abre la dirección local indicada por Vite. La carga muestra su
    barra y un control para silenciar/reactivar la música de carga.
 2. Desde el menú, abre **PERSONAJES**, selecciona gato, perro o conejo y vuelve al menú.
-3. Pulsa **JUGAR** y selecciona el nivel 1; debe aparecer el personaje elegido.
-4. Usa **PAUSAR**, `Esc` o `P` para abrir la pausa; prueba reanudar, reiniciar y los controles
-   de música y efectos.
-5. Pulsa **SALTAR** o usa `Espacio` / `Flecha Arriba` para saltar; vuelve a pulsar en el aire
-   para usar el doble salto. Espera a que se recupere la energía para volver a usar ambos saltos.
-   Mantén **AGACHARSE** o `Flecha Abajo` para agacharte bajo los obstáculos elevados.
-6. Recoge monedas y orbes, evita obstáculos y aves. Completa el nivel para desbloquear
-   el siguiente; revisa las estrellas y reintenta si quieres mejorar tu resultado.
+3. Pulsa **JUGAR** y selecciona el nivel 1; los demás se desbloquean al completar cada etapa.
+4. Usa **PAUSAR**, `Esc` o `P` en cualquier nivel para probar pausa, reinicio, audio y menú.
+5. Pulsa **SALTAR** o usa `Espacio` / `Flecha Arriba`; pulsa de nuevo en el aire para el doble
+   salto. La energía se recupera en el suelo. Mantén **AGACHARSE** o `Flecha Abajo` bajo
+   obstáculos elevados.
+6. Recoge monedas, orbes, energía y escudos; evita los peligros propios de cada mundo.
+   Completa los cinco niveles para ver el final y reintenta para mejorar las estrellas.
 7. Abre **VESTIMENTA** para ver el espacio provisional de futuros accesorios.
 8. Ejecuta `npm run build` para comprobar la compilación de producción.
 
@@ -83,8 +83,11 @@ npm run preview
 - `src/main.js`: punto de entrada de Phaser.
 - `src/style.css`: estilos adaptables para el contenedor del juego.
 - `src/game/config.js`: configuración central del motor.
-- `src/game/scenes/`: escenas de inicio, carga, menú, niveles, juego, personajes, récords y configuración.
-- `src/game/scenes/stage1/`: escena, datos de recorrido, controles y fondo del Nivel 1.
+- `src/game/scenes/`: escenas de inicio, carga, menú, selección, resultados y juego.
+- `src/game/scenes/StageScene.js`: motor reutilizable de movimiento, colisiones y puntuación.
+- `src/game/scenes/stage1/stage1Config.js` y `src/game/scenes/stages/`: recorridos y dificultad.
+- `src/game/ui/drawStageBackground.js`: fondos temáticos de día, noche y atardecer.
+- `src/game/ui/createStageControl.js`: controles táctiles reutilizables.
 - `src/game/scenes/StageResultScene.js`: resultados genéricos de victoria y derrota.
 - `src/game/scenes/PauseOverlayScene.js`: pausa reutilizable para las escenas de juego.
 - `src/game/scenes/WardrobeScene.js`: pantalla provisional de vestimenta.

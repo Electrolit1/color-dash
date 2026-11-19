@@ -9,7 +9,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
   create(data = {}) {
     this.returnSceneKey = typeof data.returnSceneKey === 'string'
       ? data.returnSceneKey
-      : 'Stage1Scene';
+      : 'StageScene';
     this.levelId = Number.isInteger(data.levelId) && data.levelId > 0
       ? data.levelId
       : 1;

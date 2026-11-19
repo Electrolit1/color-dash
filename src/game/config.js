@@ -4,7 +4,7 @@ import PreloadScene from './scenes/PreloadScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import LevelSelectScene from './scenes/LevelSelectScene.js';
 import GameScene from './scenes/GameScene.js';
-import Stage1Scene from './scenes/stage1/Stage1Scene.js';
+import StageScene from './scenes/StageScene.js';
 import StageResultScene from './scenes/StageResultScene.js';
 import PauseOverlayScene from './scenes/PauseOverlayScene.js';
 import CharacterScene from './scenes/CharacterScene.js';
@@ -28,7 +28,7 @@ const gameConfig = {
     MenuScene,
     LevelSelectScene,
     GameScene,
-    Stage1Scene,
+    StageScene,
     StageResultScene,
     PauseOverlayScene,
     CharacterScene,
