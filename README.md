@@ -29,6 +29,11 @@ npm run preview
 
 - Resolución lógica: 800 x 450.
 - Escalado: `FIT` con centrado automático, manteniendo la proporción 16:9.
+- En teléfonos, el juego ocupa el viewport y conserva la proporción; al primer toque
+  solicita pantalla completa en navegadores compatibles. La app Android bloquea la
+  orientación horizontal y oculta las barras del sistema.
+- El canvas mantiene las dimensiones calculadas por Phaser para alinear correctamente
+  las zonas táctiles y admite varios dedos a la vez.
 - Escenas: `BootScene` inicia `PreloadScene`, que lleva a `MenuScene`.
 - El menú incluye accesos a selección de niveles, personajes, récords y configuración.
 - Al elegir **JUGAR**, se abre el mapa de cinco mundos. El nivel 1 está desbloqueado
@@ -67,6 +72,8 @@ npm run preview
 
 1. Ejecuta `npm run dev` y abre la dirección local indicada por Vite. La carga muestra su
    barra y un control para silenciar/reactivar la música de carga.
+   En un teléfono, prueba en horizontal y toca una vez para activar pantalla completa
+   si el navegador lo permite.
 2. Desde el menú, abre **PERSONAJES**, selecciona gato, perro o conejo y vuelve al menú.
 3. Pulsa **JUGAR** y selecciona el nivel 1; los demás se desbloquean al completar cada etapa.
 4. Usa **PAUSAR**, `Esc` o `P` en cualquier nivel para probar pausa, reinicio, audio y menú.

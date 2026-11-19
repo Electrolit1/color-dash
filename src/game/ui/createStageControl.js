@@ -29,7 +29,7 @@ export default function createStageControl(
   button.add([graphics, text]);
   button.setSize(width, height);
   button.setInteractive(
-    new Phaser.Geom.Rectangle(0, 0, width, height),
+    new Phaser.Geom.Rectangle(-10, -10, width + 20, height + 20),
     Phaser.Geom.Rectangle.Contains,
   );
   button.input.cursor = 'pointer';

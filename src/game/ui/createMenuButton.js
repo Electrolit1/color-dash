@@ -29,7 +29,7 @@ export default function createMenuButton(
   button.add([graphics, text]);
   button.setSize(width, height);
   button.setInteractive(
-    new Phaser.Geom.Rectangle(0, 0, width, height),
+    new Phaser.Geom.Rectangle(-6, -3, width + 12, height + 6),
     Phaser.Geom.Rectangle.Contains,
   );
   button.input.cursor = 'pointer';

@@ -2,6 +2,8 @@
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   color: #28134f;
   background: #f3edff;
+  width: 100%;
+  height: 100%;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,10 +14,14 @@
   box-sizing: border-box;
 }
 
+html,
 body {
+  width: 100%;
+  height: 100%;
   min-width: 320px;
-  min-height: 100%;
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   background:
     radial-gradient(ellipse at 12% 18%, #ffe994 0, transparent 26%),
     radial-gradient(ellipse at 88% 82%, #ffc7e6 0, transparent 28%),
@@ -24,9 +30,9 @@ body {
 
 .app-shell {
   display: grid;
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100svh;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   place-items: center;
   padding:
     env(safe-area-inset-top)
@@ -36,24 +42,40 @@ body {
 }
 
 .game-container {
-  width: min(100vw, calc(100svh * 16 / 9));
+  display: grid;
+  width: min(100vw, calc(100dvh * 16 / 9));
+  height: min(100dvh, calc(100vw * 9 / 16));
   max-width: 100%;
-  aspect-ratio: 16 / 9;
+  place-items: center;
   overflow: hidden;
-  border: 3px solid #fff;
+  border: 0;
+  outline: 3px solid #fff;
   border-radius: clamp(12px, 2.5vw, 28px);
   background: #a9e7ff;
   box-shadow: 0 20px 60px rgb(85 40 168 / 18%);
+  touch-action: none;
 }
 
 .game-container canvas {
   display: block;
-  width: 100% !important;
-  height: 100% !important;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-@media (max-aspect-ratio: 3 / 4) {
+@media (pointer: coarse) {
+  .app-shell {
+    padding: 0;
+    background: #a9e7ff;
+  }
+
   .game-container {
-    border-radius: 12px;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    outline: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 }

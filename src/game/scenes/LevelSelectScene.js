@@ -70,15 +70,15 @@ export default class LevelSelectScene extends Phaser.Scene {
         : 0;
       const x = LEVEL_POSITIONS[levelId - 1];
       const y = 218;
-      const node = this.add.container(x, y);
+      const node = this.add.container(x - 43, y - 43);
       const graphics = this.add.graphics();
 
       graphics.fillStyle(0x30264a, 0.18);
-      graphics.fillCircle(0, 5, 43);
+      graphics.fillCircle(43, 48, 43);
       graphics.fillStyle(unlocked ? 0xf07832 : 0x9eabb7);
-      graphics.fillCircle(0, 0, 40);
+      graphics.fillCircle(43, 43, 40);
       graphics.lineStyle(4, 0xffffff, 0.95);
-      graphics.strokeCircle(0, 0, 40);
+      graphics.strokeCircle(43, 43, 40);
 
       if (unlocked) {
         this.addLevelNumber(node, levelId);
@@ -89,16 +89,17 @@ export default class LevelSelectScene extends Phaser.Scene {
       node.add(graphics);
       node.sendToBack(graphics);
       node.setSize(86, 86);
-      node.setInteractive(
-        new Phaser.Geom.Circle(0, 0, 43),
+      const hitArea = this.add.zone(x, y, 86, 86);
+      hitArea.setInteractive(
+        new Phaser.Geom.Circle(43, 43, 43),
         Phaser.Geom.Circle.Contains,
       );
-      node.input.cursor = 'pointer';
+      hitArea.input.cursor = 'pointer';
 
-      node.on('pointerover', () => this.animateNode(node, 1.06));
-      node.on('pointerout', () => this.animateNode(node, 1));
-      node.on('pointerdown', () => this.animateNode(node, 0.95));
-      node.on('pointerup', () => {
+      hitArea.on('pointerover', () => this.animateNode(node, 1.06));
+      hitArea.on('pointerout', () => this.animateNode(node, 1));
+      hitArea.on('pointerdown', () => this.animateNode(node, 0.95));
+      hitArea.on('pointerup', () => {
         this.animateNode(node, 1.06);
         this.registry.get('audioManager').playSfx('button');
         if (unlocked) {
@@ -139,7 +140,7 @@ export default class LevelSelectScene extends Phaser.Scene {
   }
 
   addLevelNumber(node, levelId) {
-    const number = this.add.text(0, 0, String(levelId), {
+    const number = this.add.text(43, 43, String(levelId), {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '34px',
       fontStyle: 'bold',
@@ -153,14 +154,14 @@ export default class LevelSelectScene extends Phaser.Scene {
   addLockIcon(node) {
     const lock = this.add.graphics();
     lock.lineStyle(4, 0xffffff, 0.95);
-    lock.strokeCircle(0, -8, 11);
+    lock.strokeCircle(43, 35, 11);
     lock.fillStyle(0x586776);
-    lock.fillRoundedRect(-14, -8, 28, 23, 5);
+    lock.fillRoundedRect(29, 35, 28, 23, 5);
     lock.lineStyle(2, 0xffffff, 0.85);
-    lock.strokeRoundedRect(-14, -8, 28, 23, 5);
+    lock.strokeRoundedRect(29, 35, 28, 23, 5);
     lock.fillStyle(0xffffff, 0.9);
-    lock.fillCircle(0, 1, 2.5);
-    lock.fillRoundedRect(-1.5, 2, 3, 6, 1);
+    lock.fillCircle(43, 44, 2.5);
+    lock.fillRoundedRect(41.5, 45, 3, 6, 1);
     node.add(lock);
   }
 
