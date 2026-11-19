@@ -12,7 +12,7 @@ export default class MenuScene extends Phaser.Scene {
     this.registry.get('audioManager').playMusic('menuMusic');
     drawColorfulBackground(this);
 
-    this.add.text(400, 48, 'COLOR DASH', {
+    this.add.text(400, 40, 'COLOR DASH', {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '49px',
       fontStyle: 'bold',
@@ -21,28 +21,28 @@ export default class MenuScene extends Phaser.Scene {
       strokeThickness: 9,
     }).setOrigin(0.5);
 
-    this.add.text(400, 98, '¡Corre, salta y llena el día de color!', {
+    this.add.text(400, 86, '¡Corre, salta y llena el día de color!', {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '18px',
       fontStyle: 'bold',
       color: '#3e6380',
     }).setOrigin(0.5);
 
-    createCharacterArt(this, 'cat', 257, 204, 0.88);
-    createCharacterArt(this, 'dog', 400, 204, 0.9);
-    createCharacterArt(this, 'rabbit', 543, 204, 0.88);
+    createCharacterArt(this, 'cat', 257, 164, 0.72);
+    createCharacterArt(this, 'dog', 400, 164, 0.72);
+    createCharacterArt(this, 'rabbit', 543, 164, 0.72);
 
     const buttons = [
       {
         x: 276,
-        y: 286,
+        y: 244,
         label: 'JUGAR',
         color: 0xf07832,
         onClick: () => this.scene.start('LevelSelectScene'),
       },
       {
         x: 524,
-        y: 286,
+        y: 244,
         label: 'PERSONAJES',
         color: 0x48b968,
         fontSize: 17,
@@ -50,23 +50,30 @@ export default class MenuScene extends Phaser.Scene {
       },
       {
         x: 276,
-        y: 354,
+        y: 300,
         label: 'RÉCORDS',
         color: 0x6f50d7,
         onClick: () => this.scene.start('RecordsScene'),
       },
       {
         x: 524,
-        y: 354,
+        y: 300,
         label: 'CONFIGURACIÓN',
         color: 0xe75d99,
         fontSize: 16,
         onClick: () => this.scene.start('SettingsScene'),
       },
+      {
+        x: 400,
+        y: 356,
+        label: 'VESTIMENTA',
+        color: 0x39a9c8,
+        onClick: () => this.scene.start('WardrobeScene'),
+      },
     ];
 
     buttons.forEach((button) => {
-      createMenuButton(this, { ...button, width: 224, height: 58 });
+      createMenuButton(this, { ...button, width: 224, height: 50 });
     });
 
     this.add.text(400, 420, 'Toca un botón para comenzar', {

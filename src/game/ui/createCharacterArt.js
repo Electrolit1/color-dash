@@ -10,7 +10,7 @@ const furColors = {
   rabbit: 0xfffbf4,
 };
 
-export default function createCharacterArt(scene, kind, x, y, scale = 1) {
+export default function createCharacterArt(scene, kind, x, y, scale = 1, floating = true) {
   if (!Object.prototype.hasOwnProperty.call(outlines, kind)) {
     throw new TypeError(`Personaje decorativo desconocido: ${kind}`);
   }
@@ -118,14 +118,16 @@ export default function createCharacterArt(scene, kind, x, y, scale = 1) {
 
   const character = scene.add.container(x, y, [graphics]);
   character.setScale(scale);
-  scene.tweens.add({
-    targets: character,
-    y: y - 5,
-    duration: 1050 + Math.round(x),
-    yoyo: true,
-    repeat: -1,
-    ease: 'Sine.inOut',
-  });
+  if (floating) {
+    scene.tweens.add({
+      targets: character,
+      y: y - 5,
+      duration: 1050 + Math.round(x),
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.inOut',
+    });
+  }
 
   return character;
 }

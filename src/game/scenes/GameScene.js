@@ -12,6 +12,10 @@ export default class GameScene extends Phaser.Scene {
       : 1;
 
     this.registry.get('audioManager').playMusic('gameMusic');
+    if (levelId === 1) {
+      this.scene.start('Stage1Scene');
+      return;
+    }
 
     const sky = this.add.graphics();
     sky.fillStyle(0xffdf72);
@@ -77,10 +81,10 @@ export default class GameScene extends Phaser.Scene {
       y: 385,
       width: 238,
       height: 54,
-      label: 'VOLVER AL MENÚ',
+      label: 'VOLVER A NIVELES',
       color: 0x6f50d7,
       fontSize: 16,
-      onClick: () => this.scene.start('MenuScene'),
+      onClick: () => this.scene.start('LevelSelectScene'),
     });
   }
 }

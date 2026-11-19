@@ -12,6 +12,11 @@ export default class LevelSelectScene extends Phaser.Scene {
   }
 
   create() {
+    this.registry.get('audioManager').playMusic('menuMusic');
+    const storedUnlockedLevel = Number(localStorage.getItem('colorDashUnlockedLevel') ?? 1);
+    this.highestUnlockedLevel = Number.isFinite(storedUnlockedLevel)
+      ? Phaser.Math.Clamp(Math.floor(storedUnlockedLevel), 1, LEVEL_COUNT)
+      : 1;
     drawColorfulBackground(this);
 
     this.add.text(400, 61, 'SELECCIONA UN NIVEL', {
@@ -56,7 +61,11 @@ export default class LevelSelectScene extends Phaser.Scene {
 
   createLevelNodes() {
     for (let levelId = 1; levelId <= LEVEL_COUNT; levelId++) {
-      const unlocked = levelId === 1;
+      const unlocked = levelId <= this.highestUnlockedLevel;
+      const savedStars = Number(localStorage.getItem(`colorDashLevel${levelId}Stars`) ?? 0);
+      const earnedStars = unlocked && Number.isFinite(savedStars)
+        ? Phaser.Math.Clamp(Math.floor(savedStars), 0, 3)
+        : 0;
       const x = LEVEL_POSITIONS[levelId - 1];
       const y = 218;
       const node = this.add.container(x, y);
@@ -105,10 +114,10 @@ export default class LevelSelectScene extends Phaser.Scene {
         color: unlocked ? '#5528a8' : '#687b88',
       }).setOrigin(0.5);
 
-      STAR_POSITIONS.forEach((offset) => {
+      STAR_POSITIONS.forEach((offset, index) => {
         this.add.star(x + offset, 310, 5, 5, 11, 0xffc83d)
           .setStrokeStyle(1, 0x9d8042, 0.7)
-          .setAlpha(0.42);
+          .setAlpha(index < earnedStars ? 1 : 0.42);
       });
     }
   }
