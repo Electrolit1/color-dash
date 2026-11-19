@@ -22,7 +22,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
     const panel = this.add.graphics().setDepth(101);
     panel.fillStyle(0x30264a, 0.22);
     panel.fillRoundedRect(151, 49, 502, 358, 28);
-    panel.fillStyle(0xfffcff, 0.98);
+    panel.fillStyle(0xf2eaff, 0.98);
     panel.fillRoundedRect(150, 42, 500, 358, 28);
     panel.lineStyle(4, 0xffffff, 0.98);
     panel.strokeRoundedRect(150, 42, 500, 358, 28);
@@ -45,7 +45,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
       color: 0x48b968,
       fontSize: 17,
       onClick: () => this.resumeGame(),
-    });
+    }).button.setDepth(103);
     createMenuButton(this, {
       x: 400,
       y: 205,
@@ -55,7 +55,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
       color: 0xf07832,
       fontSize: 16,
       onClick: () => this.restartLevel(),
-    });
+    }).button.setDepth(103);
 
     this.musicButton = createMenuButton(this, {
       x: 284,
@@ -70,6 +70,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
         this.updateAudioLabels();
       },
     });
+    this.musicButton.button.setDepth(103);
     this.effectsButton = createMenuButton(this, {
       x: 516,
       y: 274,
@@ -83,6 +84,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
         this.updateAudioLabels();
       },
     });
+    this.effectsButton.button.setDepth(103);
 
     createMenuButton(this, {
       x: 400,
@@ -93,7 +95,7 @@ export default class PauseOverlayScene extends Phaser.Scene {
       color: 0x58728f,
       fontSize: 16,
       onClick: () => this.returnToMenu(),
-    });
+    }).button.setDepth(103);
     this.updateAudioLabels();
 
     this.input.keyboard.on('keydown-ESC', this.resumeGame, this);

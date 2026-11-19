@@ -37,7 +37,8 @@ npm run preview
   48 segundos dividido en tres tramos y una meta.
 - Completar un nivel desbloquea el siguiente y ofrece una transición directa. Los niveles
   2–5 aún muestran una escena provisional hasta que tengan su propio contenido.
-- El Nivel 1 permite saltar y agacharse; cuenta con controles táctiles y teclado.
+- El Nivel 1 permite saltar, hacer un doble salto en el aire y agacharse; cuenta con
+  controles táctiles y teclado. Cada salto consume energía, que se recupera al tocar el suelo.
 - En **PERSONAJES** se puede elegir gato, perro o conejo. La selección se guarda en
   `colorDashSelectedCharacter` y aparece al jugar.
 - La escena de carga muestra el avance de los recursos y usa una música propia; el botón
@@ -50,8 +51,8 @@ npm run preview
   para mejorar la marca; completar el nivel desbloquea el siguiente aunque no se obtengan
   tres estrellas. Las marcas se guardan en `colorDashLevel1Stars` y el nivel desbloqueado en
   `colorDashUnlockedLevel`.
-- Los choques con obstáculos, aves que vuelan en sentido contrario o caídas en huecos terminan
-  la carrera. Los niveles 2–5 todavía no tienen contenido propio.
+- Los choques con obstáculos o aves que vuelan en sentido contrario terminan la carrera.
+  El Nivel 1 no contiene huecos; el sistema de huecos queda disponible para etapas futuras.
 - Durante el Nivel 1, **PAUSAR**, `Esc` o `P` abre la pausa para reanudar, reiniciar, cambiar
   música/efectos o volver al menú.
 - Las preferencias de música y efectos se guardan bajo `colorDashAudioPreferences`.
@@ -69,9 +70,10 @@ npm run preview
 3. Pulsa **JUGAR** y selecciona el nivel 1; debe aparecer el personaje elegido.
 4. Usa **PAUSAR**, `Esc` o `P` para abrir la pausa; prueba reanudar, reiniciar y los controles
    de música y efectos.
-5. Pulsa **SALTAR** o usa `Espacio` / `Flecha Arriba` para saltar. Mantén **AGACHARSE**
-   o `Flecha Abajo` para agacharte bajo los obstáculos elevados.
-6. Recoge monedas y orbes, evita obstáculos, aves y huecos. Completa el nivel para desbloquear
+5. Pulsa **SALTAR** o usa `Espacio` / `Flecha Arriba` para saltar; vuelve a pulsar en el aire
+   para usar el doble salto. Espera a que se recupere la energía para volver a usar ambos saltos.
+   Mantén **AGACHARSE** o `Flecha Abajo` para agacharte bajo los obstáculos elevados.
+6. Recoge monedas y orbes, evita obstáculos y aves. Completa el nivel para desbloquear
    el siguiente; revisa las estrellas y reintenta si quieres mejorar tu resultado.
 7. Abre **VESTIMENTA** para ver el espacio provisional de futuros accesorios.
 8. Ejecuta `npm run build` para comprobar la compilación de producción.

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">COLOR DASH</string>
+    <string name="title_activity_main">COLOR DASH</string>
+    <string name="package_name">com.electrolit1.colordash</string>
+    <string name="custom_url_scheme">com.electrolit1.colordash</string>
+</resources>

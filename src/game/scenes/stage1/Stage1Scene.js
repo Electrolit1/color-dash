@@ -27,6 +27,8 @@ export default class Stage1Scene extends Phaser.Scene {
     this.isGrounded = true;
     this.isFalling = false;
     this.isCrouching = false;
+    this.airJumpsUsed = 0;
+    this.jumpFatigue = 0;
     this.crouchHeld = false;
     this.hasEnded = false;
     this.pauseOpen = false;
@@ -97,6 +99,16 @@ export default class Stage1Scene extends Phaser.Scene {
       fontSize: '13px',
       color: '#35744b',
     }).setOrigin(0.5).setDepth(21);
+    this.add.text(192, 124, 'ENERGÍA', {
+      ...textStyle,
+      fontSize: '11px',
+    }).setOrigin(1, 0.5).setDepth(21);
+    const energyTrack = this.add.graphics().setDepth(20);
+    energyTrack.fillStyle(0x30264a, 0.22);
+    energyTrack.fillRoundedRect(203, 117, 140, 14, 7);
+    energyTrack.lineStyle(2, 0xffffff, 0.9);
+    energyTrack.strokeRoundedRect(203, 117, 140, 14, 7);
+    this.jumpEnergyBar = this.add.graphics().setDepth(21);
     createMenuButton(this, {
       x: 714,
       y: 97,
@@ -107,13 +119,14 @@ export default class Stage1Scene extends Phaser.Scene {
       fontSize: 13,
       onClick: () => this.openPause(),
     }).button.setDepth(22);
-    this.bonusText = this.add.text(400, 124, '', {
+    this.bonusText = this.add.text(550, 124, '', {
       ...textStyle,
       fontSize: '14px',
       color: '#a54fce',
       stroke: '#ffffff',
       strokeThickness: 3,
     }).setOrigin(0.5).setDepth(21).setAlpha(0);
+    this.updateJumpEnergyHud();
   }
 
   createControls() {
@@ -189,13 +202,28 @@ export default class Stage1Scene extends Phaser.Scene {
   }
 
   tryJump() {
-    if (!this.isGrounded || this.isCrouching || this.hasEnded) {
+    const fatigueAfterJump = this.jumpFatigue + STAGE1_CONFIG.jumpFatiguePerJump;
+    if (
+      this.isCrouching
+      || this.hasEnded
+      || fatigueAfterJump > STAGE1_CONFIG.jumpFatigueMax
+    ) {
       return;
     }
 
-    this.isGrounded = false;
-    this.isFalling = false;
-    this.playerVelocityY = STAGE1_CONFIG.jumpVelocity;
+    if (this.isGrounded) {
+      this.isGrounded = false;
+      this.isFalling = false;
+      this.airJumpsUsed = 0;
+      this.playerVelocityY = STAGE1_CONFIG.jumpVelocity;
+    } else if (!this.isFalling && this.airJumpsUsed === 0) {
+      this.airJumpsUsed = 1;
+      this.playerVelocityY = STAGE1_CONFIG.doubleJumpVelocity;
+    } else {
+      return;
+    }
+
+    this.jumpFatigue = fatigueAfterJump;
     this.audio.playSfx('jump');
   }
 
@@ -238,8 +266,16 @@ export default class Stage1Scene extends Phaser.Scene {
           this.playerVelocityY = 80;
         } else {
           this.isGrounded = true;
+          this.airJumpsUsed = 0;
         }
       }
+    }
+
+    if (this.isGrounded) {
+      this.jumpFatigue = Math.max(
+        0,
+        this.jumpFatigue - STAGE1_CONFIG.jumpFatigueRecovery * seconds,
+      );
     }
 
     const bodyHeight = this.isCrouching ? CROUCH_HEIGHT : PLAYER_HEIGHT;
@@ -261,11 +297,17 @@ export default class Stage1Scene extends Phaser.Scene {
   }
 
   isPlayerOverGap() {
-    const halfWidth = PLAYER_WIDTH / 2;
-    return STAGE1_CONFIG.events.some((event) => (
-      event.type === 'gap'
-      && Math.abs(event.distance - this.worldDistance) <= event.width / 2 + halfWidth
-    ));
+    const playerLeft = this.worldDistance - PLAYER_WIDTH / 2;
+    const playerRight = this.worldDistance + PLAYER_WIDTH / 2;
+    return STAGE1_CONFIG.events.some((event) => {
+      if (event.type !== 'gap') {
+        return false;
+      }
+
+      const openingHalfWidth = Math.max(0, event.width - 12) / 2;
+      return playerLeft < event.distance + openingHalfWidth
+        && playerRight > event.distance - openingHalfWidth;
+    });
   }
 
   updateBackground(seconds) {
@@ -522,6 +564,18 @@ export default class Stage1Scene extends Phaser.Scene {
     );
     this.segmentText.setText(`TRAMO ${Math.max(0, segmentIndex) + 1}/3`);
     this.bonusText.setAlpha(this.bonusRemaining > 0 ? 1 : 0);
+    this.updateJumpEnergyHud();
+  }
+
+  updateJumpEnergyHud() {
+    const energy = 1 - this.jumpFatigue / STAGE1_CONFIG.jumpFatigueMax;
+    this.jumpEnergyBar.clear();
+    if (energy <= 0) {
+      return;
+    }
+
+    this.jumpEnergyBar.fillStyle(energy > 0.5 ? 0x48b968 : 0xf07832);
+    this.jumpEnergyBar.fillRoundedRect(206, 120, 134 * energy, 8, 4);
   }
 
   finishLevel(completed) {
