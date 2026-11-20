@@ -90,6 +90,127 @@ function drawThemeDetails(scene, stageConfig) {
     details.moveTo(669, 153);
     details.lineTo(709, 153);
     details.strokePath();
+  } else if (['ocean', 'deep-ocean', 'river', 'waterfall'].includes(stageConfig.theme)) {
+    const waterColor = stageConfig.theme === 'deep-ocean' ? 0x7be8ff : 0xe7ffff;
+    details.lineStyle(5, waterColor, 0.7);
+    for (let wave = 0; wave < 4; wave += 1) {
+      const y = 178 + wave * 20;
+      details.beginPath();
+      details.moveTo(20, y);
+      details.lineTo(92, y - 10);
+      details.lineTo(158, y + 4);
+      details.lineTo(222, y - 8);
+      details.strokePath();
+    }
+
+    for (let bubble = 0; bubble < 7; bubble += 1) {
+      details.strokeCircle(62 + bubble * 105, 78 + (bubble % 3) * 28, 4 + (bubble % 2) * 2);
+    }
+
+    if (stageConfig.theme === 'ocean' || stageConfig.theme === 'deep-ocean') {
+      details.lineStyle(8, 0xff8ca8, 0.9);
+      details.beginPath();
+      details.moveTo(676, 304);
+      details.lineTo(676, 260);
+      details.lineTo(654, 240);
+      details.moveTo(676, 278);
+      details.lineTo(700, 250);
+      details.moveTo(700, 250);
+      details.lineTo(714, 232);
+      details.strokePath();
+    } else {
+      details.fillStyle(0xffffff, 0.6);
+      details.fillTriangle(620, 280, 686, 150, 752, 280);
+      details.fillStyle(0xa7efff, 0.7);
+      details.fillRect(675, 160, 20, 118);
+    }
+  } else if (stageConfig.theme === 'jungle') {
+    [65, 725].forEach((x) => {
+      details.fillStyle(0x76513b);
+      details.fillRoundedRect(x - 9, 176, 18, 147, 8);
+      details.fillStyle(0x43a85a);
+      details.fillCircle(x - 18, 176, 29);
+      details.fillCircle(x + 16, 164, 34);
+      details.fillCircle(x + 3, 140, 27);
+    });
+  } else if (stageConfig.theme === 'volcano') {
+    details.fillStyle(0x653d58);
+    details.fillTriangle(388, 302, 526, 106, 668, 302);
+    details.fillStyle(0xffa05a);
+    details.fillTriangle(486, 164, 526, 106, 570, 164);
+    details.fillStyle(0xffd66e, 0.85);
+    details.fillTriangle(504, 157, 526, 120, 547, 157);
+  } else if (stageConfig.theme === 'clouds' || stageConfig.theme === 'rainbow') {
+    if (stageConfig.theme === 'rainbow') {
+      [0xff7185, 0xffc45d, 0xffeb68, 0x7edc9a, 0x73caff, 0xb085f5].forEach((color, index) => {
+        details.lineStyle(8, color, 0.9);
+        details.strokeCircle(400, 318, 156 - index * 11);
+      });
+    } else {
+      [105, 330, 585].forEach((x, index) => {
+        const y = 164 + (index % 2) * 34;
+        details.fillStyle(0xffffff, 0.86);
+        details.fillCircle(x - 25, y, 24);
+        details.fillCircle(x + 2, y - 12, 31);
+        details.fillCircle(x + 32, y, 23);
+      });
+    }
+  } else if (stageConfig.theme === 'desert') {
+    [640, 714].forEach((x, index) => {
+      details.lineStyle(12, 0x4f9855, 0.9);
+      details.beginPath();
+      details.moveTo(x, 310);
+      details.lineTo(x, 214 + index * 12);
+      details.moveTo(x, 270);
+      details.lineTo(x - 20, 250);
+      details.moveTo(x, 284);
+      details.lineTo(x + 20, 264);
+      details.strokePath();
+    });
+  } else if (stageConfig.theme === 'robot') {
+    [90, 170, 660, 728].forEach((x, index) => {
+      const height = 88 + (index % 2) * 35;
+      details.fillStyle(0x374b86, 0.9);
+      details.fillRoundedRect(x - 25, 300 - height, 50, height, 7);
+      details.fillStyle(0x8ff3df, 0.85);
+      for (let row = 0; row < 3; row += 1) {
+        details.fillRoundedRect(x - 15, 225 - height + row * 26, 10, 12, 3);
+        details.fillRoundedRect(x + 5, 225 - height + row * 26, 10, 12, 3);
+      }
+    });
+  } else if (stageConfig.theme === 'planet' || stageConfig.theme === 'moon' || stageConfig.theme === 'galaxy') {
+    details.lineStyle(7, 0xd7c5ff, 0.78);
+    details.strokeEllipse(658, 184, 142, 42);
+    details.fillStyle(stageConfig.theme === 'moon' ? 0xc3d0e7 : 0x9f87e7, 0.95);
+    details.fillCircle(658, 184, 42);
+    details.fillStyle(0x554f8a, 0.72);
+    details.fillCircle(646, 174, 8);
+    details.fillCircle(673, 192, 6);
+    if (stageConfig.theme === 'galaxy') {
+      details.fillStyle(0xffd35e);
+      details.fillTriangle(510, 117, 504, 130, 516, 130);
+      details.fillTriangle(510, 143, 504, 130, 516, 130);
+      details.fillTriangle(497, 130, 510, 124, 510, 136);
+      details.fillTriangle(523, 130, 510, 124, 510, 136);
+      details.fillTriangle(572, 193, 567, 204, 577, 204);
+      details.fillTriangle(572, 215, 567, 204, 577, 204);
+      details.fillTriangle(561, 204, 572, 199, 572, 209);
+      details.fillTriangle(583, 204, 572, 199, 572, 209);
+    }
+  } else if (stageConfig.theme === 'autumn') {
+    [120, 220, 585, 694].forEach((x, index) => {
+      details.fillStyle(index % 2 === 0 ? 0xf3a34f : 0xd75c4c, 0.9);
+      details.fillEllipse(x, 174 + (index % 2) * 22, 18, 10);
+      details.fillEllipse(x + 26, 203, 15, 9);
+    });
+  } else if (stageConfig.theme === 'crystal') {
+    [115, 680, 732].forEach((x, index) => {
+      const height = 64 + index * 18;
+      details.fillStyle(index % 2 === 0 ? 0x8de9ff : 0xc1a7ff, 0.8);
+      details.fillTriangle(x - 22, 307, x, 307 - height, x + 23, 307);
+      details.fillStyle(0xffffff, 0.72);
+      details.fillTriangle(x - 4, 292, x, 307 - height, x + 4, 292);
+    });
   }
 
   details.setDepth(-9);
@@ -152,11 +273,13 @@ export default function drawStageBackground(scene, stageConfig) {
   ground.fillRect(0, floorY, 800, 8);
 
   const marks = [];
-  const markColor = stageConfig.theme === 'meadow'
-    ? 0x358e4a
-    : stageConfig.theme === 'snow'
-      ? 0x6d91b8
-      : 0x263e50;
+  const markColor = ['ocean', 'deep-ocean', 'river', 'waterfall'].includes(stageConfig.theme)
+    ? 0xa5f3ed
+    : stageConfig.theme === 'meadow'
+      ? 0x358e4a
+      : stageConfig.theme === 'snow'
+        ? 0x6d91b8
+        : 0x263e50;
   for (let x = 20; x < 820; x += 74) {
     const mark = scene.add.graphics().setPosition(x, floorY + 31);
     mark.lineStyle(3, markColor, 0.52);

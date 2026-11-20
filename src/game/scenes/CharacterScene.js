@@ -8,8 +8,8 @@ import {
   saveSelectedCharacter,
 } from '../systems/CharacterPreferences.js';
 
-const CARD_POSITIONS = [220, 400, 580];
-const CARD_COLORS = [0xffe6bd, 0xffedc9, 0xf7e5ff];
+const CARD_POSITIONS = [130, 310, 490, 670];
+const CARD_COLORS = [0xffe6bd, 0xffedc9, 0xf7e5ff, 0xe4f4ed];
 
 export default class CharacterScene extends Phaser.Scene {
   constructor() {
@@ -42,8 +42,8 @@ export default class CharacterScene extends Phaser.Scene {
       const x = CARD_POSITIONS[index];
       const color = CARD_COLORS[index];
       const card = this.add.graphics();
-      createCharacterArt(this, id, x, 232, 0.94);
-      this.add.text(x, 319, label, {
+      createCharacterArt(this, id, x, 222, 0.72);
+      this.add.text(x, 297, label, {
         fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
         fontSize: '17px',
         fontStyle: 'bold',
@@ -52,7 +52,7 @@ export default class CharacterScene extends Phaser.Scene {
 
       const selectButton = createMenuButton(this, {
         x,
-        y: 356,
+        y: 339,
         width: 126,
         height: 38,
         label: '',
@@ -86,9 +86,9 @@ export default class CharacterScene extends Phaser.Scene {
       const selected = id === this.selectedCharacter;
       card.clear();
       card.fillStyle(color, 0.9);
-      card.fillRoundedRect(x - 70, 145, 140, 235, 22);
+      card.fillRoundedRect(x - 72, 136, 144, 235, 22);
       card.lineStyle(selected ? 5 : 3, selected ? 0x48b968 : 0xffffff, 0.98);
-      card.strokeRoundedRect(x - 70, 145, 140, 235, 22);
+      card.strokeRoundedRect(x - 72, 136, 144, 235, 22);
       selectButton.setLabel(selected ? 'SELECCIONADO' : 'SELECCIONAR');
       selectButton.button.setScale(selected ? 1.03 : 1);
     });

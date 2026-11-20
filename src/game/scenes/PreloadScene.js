@@ -16,12 +16,21 @@ const AUDIO_KEYS = new Map([
   ['/src/assets/audio/music/menu-theme.wav', 'menuMusic'],
   ['/src/assets/audio/music/game-theme.mp3', 'gameMusic'],
   ['/src/assets/audio/music/game-theme.wav', 'gameMusic'],
+  ['/src/assets/audio/music/water-ambient.wav', 'waterMusic'],
+  ['/src/assets/audio/music/forest-ambient.wav', 'forestMusic'],
+  ['/src/assets/audio/music/space-ambient.wav', 'spaceMusic'],
   ['/src/assets/audio/sfx/button.wav', 'button'],
   ['/src/assets/audio/sfx/jump.wav', 'jump'],
   ['/src/assets/audio/sfx/coin.wav', 'coin'],
   ['/src/assets/audio/sfx/star.wav', 'star'],
   ['/src/assets/audio/sfx/collision.wav', 'collision'],
   ['/src/assets/audio/sfx/night-bird.wav', 'nightBird'],
+  ['/src/assets/audio/sfx/splash.wav', 'splash'],
+  ['/src/assets/audio/sfx/electric.wav', 'electric'],
+  ['/src/assets/audio/sfx/animal-call.wav', 'animalCall'],
+  ['/src/assets/audio/sfx/unlock.wav', 'unlock'],
+  ['/src/assets/audio/sfx/victory.wav', 'victory'],
+  ['/src/assets/audio/sfx/oops.wav', 'oops'],
 ]);
 
 export default class PreloadScene extends Phaser.Scene {

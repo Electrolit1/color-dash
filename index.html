@@ -18,6 +18,42 @@
         role="application"
         aria-label="Juego COLOR DASH"
       ></div>
+      <section
+        id="start-screen"
+        class="start-screen"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="start-title"
+      >
+        <div class="start-panel">
+          <h1 id="start-title">¡Bienvenido a COLOR DASH!</h1>
+          <p>
+            El juego mantiene su formato y se centra en la pantalla. Para jugar
+            en teléfono, se recomienda usarlo en horizontal.
+          </p>
+          <fieldset class="start-options">
+            <label class="start-option">
+              <input id="music-option" type="checkbox" />
+              <span>Permitir música</span>
+            </label>
+            <label class="start-option">
+              <input id="effects-option" type="checkbox" />
+              <span>Permitir efectos de sonido</span>
+            </label>
+            <label id="display-option" class="start-option">
+              <input id="immersive-option" type="checkbox" checked />
+              <span>Solicitar pantalla completa y orientación horizontal si el navegador lo permite</span>
+            </label>
+          </fieldset>
+          <p>
+            No se necesitan permisos de Android: el sonido se controla aquí y
+            el modo de pantalla completa depende del navegador.
+          </p>
+          <button id="start-button" class="start-button" type="button">
+            ACEPTAR Y JUGAR
+          </button>
+        </div>
+      </section>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>

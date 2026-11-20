@@ -5,19 +5,57 @@ import gameConfig from './game/config.js';
 import AudioManager from './game/systems/AudioManager.js';
 
 const game = new Phaser.Game(gameConfig);
-game.registry.set('audioManager', new AudioManager(game));
+const audioManager = new AudioManager(game);
+game.registry.set('audioManager', audioManager);
 
-if (!Capacitor.isNativePlatform() && window.matchMedia('(pointer: coarse)').matches) {
-  document.addEventListener('pointerdown', () => {
-    const root = document.documentElement;
-    if (document.fullscreenElement || typeof root.requestFullscreen !== 'function') {
-      return;
-    }
+const startScreen = document.getElementById('start-screen');
+const startButton = document.getElementById('start-button');
+const musicOption = document.getElementById('music-option');
+const effectsOption = document.getElementById('effects-option');
+const immersiveOption = document.getElementById('immersive-option');
+const displayOption = document.getElementById('display-option');
+const nativeApp = Capacitor.isNativePlatform();
+const mobileBrowser = !nativeApp && window.matchMedia('(pointer: coarse)').matches;
 
-    void root.requestFullscreen().catch((error) => {
+if (!startScreen || !startButton || !musicOption || !effectsOption || !immersiveOption || !displayOption) {
+  throw new Error('No se pudo preparar la pantalla de inicio de COLOR DASH.');
+}
+
+const savedAudioPreferences = audioManager.getPreferences();
+musicOption.checked = savedAudioPreferences.music;
+effectsOption.checked = savedAudioPreferences.effects;
+displayOption.hidden = !mobileBrowser;
+
+startButton.addEventListener('click', () => {
+  audioManager.setMusicEnabled(musicOption.checked);
+  audioManager.setEffectsEnabled(effectsOption.checked);
+  audioManager.setAudioConsent(true);
+  game.sound.unlock();
+  startScreen.hidden = true;
+
+  if (mobileBrowser && immersiveOption.checked) {
+    void requestImmersiveDisplay();
+  }
+});
+
+async function requestImmersiveDisplay() {
+  const root = document.documentElement;
+
+  if (!document.fullscreenElement && typeof root.requestFullscreen === 'function') {
+    try {
+      await root.requestFullscreen();
+    } catch (error) {
       console.info('Este navegador no permitió activar la pantalla completa.', error);
-    });
-  }, { once: true, passive: true });
+    }
+  }
+
+  if (screen.orientation && typeof screen.orientation.lock === 'function') {
+    try {
+      await screen.orientation.lock('landscape');
+    } catch (error) {
+      console.info('Este navegador no permitió fijar la orientación horizontal.', error);
+    }
+  }
 }
 
 if (import.meta.hot) {

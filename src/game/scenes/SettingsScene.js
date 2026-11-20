@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import createMenuButton from '../ui/createMenuButton.js';
-import drawColorfulBackground from '../ui/drawColorfulBackground.js';
+import { drawSettingsBackground } from '../ui/drawSceneBackgrounds.js';
 
 export default class SettingsScene extends Phaser.Scene {
   constructor() {
@@ -8,7 +8,7 @@ export default class SettingsScene extends Phaser.Scene {
   }
 
   create() {
-    drawColorfulBackground(this);
+    drawSettingsBackground(this);
 
     this.add.text(400, 66, 'CONFIGURACIÓN', {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
@@ -23,7 +23,9 @@ export default class SettingsScene extends Phaser.Scene {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '16px',
       fontStyle: 'bold',
-      color: '#3e6380',
+      color: '#f5f4ff',
+      stroke: '#28366b',
+      strokeThickness: 2,
     }).setOrigin(0.5);
 
     const audioManager = this.registry.get('audioManager');
@@ -61,7 +63,9 @@ export default class SettingsScene extends Phaser.Scene {
     this.add.text(400, 337, 'Las preferencias quedan guardadas en este dispositivo.', {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '13px',
-      color: '#3e6380',
+      color: '#f5f4ff',
+      stroke: '#28366b',
+      strokeThickness: 2,
       align: 'center',
     }).setOrigin(0.5);
 

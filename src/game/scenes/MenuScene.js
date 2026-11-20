@@ -28,9 +28,10 @@ export default class MenuScene extends Phaser.Scene {
       color: '#3e6380',
     }).setOrigin(0.5);
 
-    createCharacterArt(this, 'cat', 257, 164, 0.72);
-    createCharacterArt(this, 'dog', 400, 164, 0.72);
-    createCharacterArt(this, 'rabbit', 543, 164, 0.72);
+    createCharacterArt(this, 'cat', 205, 164, 0.56);
+    createCharacterArt(this, 'dog', 335, 164, 0.56);
+    createCharacterArt(this, 'rabbit', 465, 164, 0.56);
+    createCharacterArt(this, 'panda', 595, 164, 0.56);
 
     const buttons = [
       {

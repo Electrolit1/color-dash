@@ -4,6 +4,7 @@ import drawColorfulBackground from '../ui/drawColorfulBackground.js';
 import { STAGE_CONFIGS } from './stages/stageConfigs.js';
 
 const LEVEL_COUNT = STAGE_CONFIGS.length;
+const LEVELS_PER_PAGE = 5;
 const LEVEL_POSITIONS = [88, 244, 400, 556, 712];
 const STAR_POSITIONS = [-20, 0, 20];
 
@@ -14,6 +15,7 @@ export default class LevelSelectScene extends Phaser.Scene {
 
   create() {
     this.registry.get('audioManager').playMusic('menuMusic');
+    this.currentPage = 0;
     const storedUnlockedLevel = Number(localStorage.getItem('colorDashUnlockedLevel') ?? 1);
     this.highestUnlockedLevel = Number.isFinite(storedUnlockedLevel)
       ? Phaser.Math.Clamp(Math.floor(storedUnlockedLevel), 1, LEVEL_COUNT)
@@ -29,14 +31,14 @@ export default class LevelSelectScene extends Phaser.Scene {
       strokeThickness: 8,
     }).setOrigin(0.5);
 
-    this.add.text(400, 109, 'Cinco mundos, peligros y dificultad creciente', {
+    this.add.text(400, 109, `${LEVEL_COUNT} pistas, peligros y dificultad creciente`, {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
       fontSize: '16px',
       fontStyle: 'bold',
       color: '#3e6380',
     }).setOrigin(0.5);
 
-    this.createLevelNodes();
+    this.levelContents = this.add.container(0, 0);
 
     this.lockedMessage = this.add.text(400, 350, '', {
       fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
@@ -48,27 +50,59 @@ export default class LevelSelectScene extends Phaser.Scene {
       align: 'center',
     }).setOrigin(0.5).setAlpha(0);
 
+    this.pageText = this.add.text(400, 388, '', {
+      fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
+      fontSize: '13px',
+      fontStyle: 'bold',
+      color: '#5528a8',
+    }).setOrigin(0.5);
+    this.previousPageButton = createMenuButton(this, {
+      x: 230,
+      y: 388,
+      width: 144,
+      height: 42,
+      label: 'ANTERIOR',
+      color: 0x6f50d7,
+      fontSize: 13,
+      onClick: () => this.changePage(-1),
+    });
+    this.nextPageButton = createMenuButton(this, {
+      x: 570,
+      y: 388,
+      width: 144,
+      height: 42,
+      label: 'SIGUIENTE',
+      color: 0x48b968,
+      fontSize: 13,
+      onClick: () => this.changePage(1),
+    });
+    this.createLevelNodes();
+
     createMenuButton(this, {
       x: 400,
-      y: 408,
-      width: 238,
-      height: 50,
+      y: 428,
+      width: 224,
+      height: 40,
       label: 'VOLVER AL MENÚ',
       color: 0x6f50d7,
-      fontSize: 16,
+      fontSize: 14,
       onClick: () => this.scene.start('MenuScene'),
     });
   }
 
   createLevelNodes() {
-    for (let levelId = 1; levelId <= LEVEL_COUNT; levelId++) {
+    this.levelContents.removeAll(true);
+    const firstLevel = this.currentPage * LEVELS_PER_PAGE + 1;
+    const lastLevel = Math.min(LEVEL_COUNT, firstLevel + LEVELS_PER_PAGE - 1);
+
+    for (let levelId = firstLevel; levelId <= lastLevel; levelId++) {
       const unlocked = levelId <= this.highestUnlockedLevel;
       const stageConfig = STAGE_CONFIGS[levelId - 1];
       const savedStars = Number(localStorage.getItem(`colorDashLevel${levelId}Stars`) ?? 0);
       const earnedStars = unlocked && Number.isFinite(savedStars)
         ? Phaser.Math.Clamp(Math.floor(savedStars), 0, 3)
         : 0;
-      const x = LEVEL_POSITIONS[levelId - 1];
+      const x = LEVEL_POSITIONS[(levelId - 1) % LEVELS_PER_PAGE];
       const y = 218;
       const node = this.add.container(x - 43, y - 43);
       const graphics = this.add.graphics();
@@ -89,6 +123,7 @@ export default class LevelSelectScene extends Phaser.Scene {
       node.add(graphics);
       node.sendToBack(graphics);
       node.setSize(86, 86);
+      this.levelContents.add(node);
       const hitArea = this.add.zone(x, y, 86, 86);
       hitArea.setInteractive(
         new Phaser.Geom.Circle(43, 43, 43),
@@ -110,33 +145,55 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.showLockedMessage(levelId);
       });
 
-      this.add.text(x, 274, `NIVEL ${levelId}`, {
+      this.levelContents.add(hitArea);
+      this.levelContents.add(this.add.text(x, 274, `NIVEL ${levelId}`, {
         fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
         fontSize: '13px',
         fontStyle: 'bold',
         color: unlocked ? '#5528a8' : '#687b88',
-      }).setOrigin(0.5);
+      }).setOrigin(0.5));
 
-      this.add.text(x, 293, stageConfig.shortName, {
+      this.levelContents.add(this.add.text(x, 293, stageConfig.shortName, {
         fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
         fontSize: '10px',
         fontStyle: 'bold',
         color: unlocked ? '#3e6380' : '#687b88',
-      }).setOrigin(0.5);
+      }).setOrigin(0.5));
 
       STAR_POSITIONS.forEach((offset, index) => {
-        this.add.star(x + offset, 316, 5, 5, 11, 0xffc83d)
+        const star = this.add.star(x + offset, 316, 5, 5, 11, 0xffc83d)
           .setStrokeStyle(1, 0x9d8042, 0.7)
           .setAlpha(index < earnedStars ? 1 : 0.42);
+        this.levelContents.add(star);
       });
 
-      this.add.text(x, 338, `${stageConfig.difficulty}${stageConfig.mode === 'night' ? ' · NOCHE' : ''}`, {
+      this.levelContents.add(this.add.text(x, 338, `${stageConfig.difficulty}${stageConfig.mode === 'night' ? ' · NOCHE' : ''}`, {
         fontFamily: '"Trebuchet MS", "Segoe UI", sans-serif',
         fontSize: '9px',
         fontStyle: 'bold',
         color: stageConfig.mode === 'night' ? '#4c4a83' : '#3e6380',
-      }).setOrigin(0.5);
+      }).setOrigin(0.5));
     }
+
+    if (this.pageText && this.previousPageButton && this.nextPageButton) {
+      this.updatePageControls();
+    }
+  }
+
+  changePage(direction) {
+    const pageCount = Math.ceil(LEVEL_COUNT / LEVELS_PER_PAGE);
+    this.currentPage = Phaser.Math.Clamp(this.currentPage + direction, 0, pageCount - 1);
+    this.lockedMessage.setAlpha(0);
+    this.createLevelNodes();
+  }
+
+  updatePageControls() {
+    const pageCount = Math.ceil(LEVEL_COUNT / LEVELS_PER_PAGE);
+    const firstLevel = this.currentPage * LEVELS_PER_PAGE + 1;
+    const lastLevel = Math.min(LEVEL_COUNT, firstLevel + LEVELS_PER_PAGE - 1);
+    this.pageText.setText(`PISTAS ${firstLevel}–${lastLevel} · PÁGINA ${this.currentPage + 1}/${pageCount}`);
+    this.previousPageButton.button.setVisible(this.currentPage > 0);
+    this.nextPageButton.button.setVisible(this.currentPage < pageCount - 1);
   }
 
   addLevelNumber(node, levelId) {

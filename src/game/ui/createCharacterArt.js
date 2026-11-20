@@ -2,15 +2,101 @@ const outlines = {
   cat: 0x874c32,
   dog: 0x8c633d,
   rabbit: 0x77718b,
+  panda: 0x44404e,
 };
 
 const furColors = {
   cat: 0xffad52,
   dog: 0xe9bd7a,
   rabbit: 0xfffbf4,
+  panda: 0xf8f5ef,
 };
 
-export default function createCharacterArt(scene, kind, x, y, scale = 1, floating = true) {
+const OUTFIT_IDS = new Set([
+  'none',
+  'leaf-crown',
+  'shell-tiara',
+  'rainbow-glasses',
+  'astronaut-helmet',
+  'dragon-hood',
+]);
+
+function drawOutfit(graphics, outfitId) {
+  if (!OUTFIT_IDS.has(outfitId)) {
+    throw new TypeError(`Vestimenta decorativa desconocida: ${outfitId}`);
+  }
+  if (outfitId === 'none') {
+    return;
+  }
+
+  if (outfitId === 'leaf-crown') {
+    graphics.fillStyle(0x49a85e);
+    graphics.fillTriangle(-23, -39, -15, -59, -5, -39);
+    graphics.fillTriangle(-10, -40, 0, -63, 10, -40);
+    graphics.fillTriangle(5, -39, 17, -58, 24, -39);
+    graphics.fillRoundedRect(-24, -40, 48, 7, 4);
+    return;
+  }
+
+  if (outfitId === 'shell-tiara') {
+    graphics.fillStyle(0xf0a85e);
+    graphics.fillRoundedRect(-24, -43, 48, 8, 4);
+    graphics.fillStyle(0xffe59a);
+    graphics.fillCircle(-16, -48, 7);
+    graphics.fillCircle(-5, -52, 8);
+    graphics.fillCircle(7, -52, 8);
+    graphics.fillCircle(18, -48, 7);
+    graphics.lineStyle(2, 0xe58085, 0.9);
+    graphics.strokeCircle(-5, -52, 5);
+    graphics.strokeCircle(7, -52, 5);
+    return;
+  }
+
+  if (outfitId === 'rainbow-glasses') {
+    graphics.lineStyle(4, 0x7d50bd);
+    graphics.strokeCircle(-12, -22, 10);
+    graphics.strokeCircle(12, -22, 10);
+    graphics.beginPath();
+    graphics.moveTo(-2, -22);
+    graphics.lineTo(2, -22);
+    graphics.strokePath();
+    graphics.lineStyle(2, 0xff7c91);
+    graphics.strokeCircle(-12, -22, 7);
+    graphics.lineStyle(2, 0x54b8e9);
+    graphics.strokeCircle(12, -22, 7);
+    return;
+  }
+
+  if (outfitId === 'astronaut-helmet') {
+    graphics.fillStyle(0xbdeeff, 0.2);
+    graphics.fillCircle(0, -17, 35);
+    graphics.lineStyle(4, 0xcdf6ff, 0.95);
+    graphics.strokeCircle(0, -17, 35);
+    graphics.fillStyle(0xffffff, 0.7);
+    graphics.fillEllipse(-16, -37, 7, 13);
+    return;
+  }
+
+  graphics.fillStyle(0x55a866);
+  graphics.fillTriangle(-24, -28, -22, -56, -5, -35);
+  graphics.fillTriangle(24, -28, 22, -56, 5, -35);
+  graphics.lineStyle(3, 0x367b4a);
+  graphics.beginPath();
+  graphics.moveTo(-24, -40);
+  graphics.lineTo(0, -47);
+  graphics.lineTo(24, -40);
+  graphics.strokePath();
+}
+
+export default function createCharacterArt(
+  scene,
+  kind,
+  x,
+  y,
+  scale = 1,
+  floating = true,
+  outfitId = 'none',
+) {
   if (!Object.prototype.hasOwnProperty.call(outlines, kind)) {
     throw new TypeError(`Personaje decorativo desconocido: ${kind}`);
   }
@@ -46,7 +132,7 @@ export default function createCharacterArt(scene, kind, x, y, scale = 1, floatin
     graphics.lineStyle(3, outline);
     graphics.strokeEllipse(-24, -18, 19, 38);
     graphics.strokeEllipse(24, -18, 19, 38);
-  } else {
+  } else if (kind === 'rabbit') {
     graphics.fillStyle(fur);
     graphics.fillEllipse(-12, -48, 17, 47);
     graphics.fillEllipse(12, -48, 17, 47);
@@ -56,6 +142,13 @@ export default function createCharacterArt(scene, kind, x, y, scale = 1, floatin
     graphics.fillStyle(0xf3a4bb);
     graphics.fillEllipse(-12, -48, 7, 32);
     graphics.fillEllipse(12, -48, 7, 32);
+  } else {
+    graphics.fillStyle(0x302d38);
+    graphics.fillCircle(-20, -35, 12);
+    graphics.fillCircle(20, -35, 12);
+    graphics.lineStyle(3, outline);
+    graphics.strokeCircle(-20, -35, 12);
+    graphics.strokeCircle(20, -35, 12);
   }
 
   graphics.fillStyle(fur);
@@ -79,6 +172,23 @@ export default function createCharacterArt(scene, kind, x, y, scale = 1, floatin
     graphics.fillStyle(0xffffff);
     graphics.fillCircle(-10, -23, 8);
     graphics.fillCircle(10, -23, 8);
+  } else if (kind === 'panda') {
+    graphics.fillStyle(0x302d38);
+    graphics.fillEllipse(-10, -22, 14, 18);
+    graphics.fillEllipse(10, -22, 14, 18);
+    graphics.fillStyle(0xffffff);
+    graphics.fillCircle(-11, -23, 3.5);
+    graphics.fillCircle(9, -23, 3.5);
+    graphics.fillStyle(0x30264a);
+    graphics.fillCircle(-10, -23, 1.8);
+    graphics.fillCircle(10, -23, 1.8);
+    graphics.fillStyle(0xffffff);
+    graphics.fillEllipse(0, -6, 20, 15);
+    graphics.fillStyle(0x302d38);
+    graphics.fillEllipse(0, -10, 7, 5);
+    graphics.fillStyle(0xf0a3ae);
+    graphics.fillCircle(-18, -7, 3);
+    graphics.fillCircle(18, -7, 3);
   } else {
     graphics.fillStyle(0xffffff);
     graphics.fillEllipse(0, -7, 22, 16);
@@ -115,6 +225,8 @@ export default function createCharacterArt(scene, kind, x, y, scale = 1, floatin
     graphics.fillCircle(-18, -9, 4);
     graphics.fillCircle(18, -9, 4);
   }
+
+  drawOutfit(graphics, outfitId);
 
   const character = scene.add.container(x, y, [graphics]);
   character.setScale(scale);

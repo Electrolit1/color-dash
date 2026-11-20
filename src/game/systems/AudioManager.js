@@ -12,10 +12,18 @@ export default class AudioManager {
     this.activeEffects = new Set();
     this.pendingEffects = [];
     this.unlockListenerAttached = false;
+    this.audioConsent = false;
   }
 
   getPreferences() {
     return { ...this.preferences };
+  }
+
+  setAudioConsent(consented) {
+    this.audioConsent = consented;
+    if (consented && this.currentMusicKey) {
+      this.playMusic(this.currentMusicKey);
+    }
   }
 
   playMusic(key) {
@@ -26,7 +34,7 @@ export default class AudioManager {
     this.stopMusicSound();
     this.currentMusicKey = key;
 
-    if (!this.preferences.music || !this.game.cache.audio.exists(key)) {
+    if (!this.audioConsent || !this.preferences.music || !this.game.cache.audio.exists(key)) {
       return;
     }
 
@@ -39,7 +47,7 @@ export default class AudioManager {
   }
 
   playSfx(key, volume = DEFAULT_EFFECT_VOLUME) {
-    if (!this.preferences.effects || !this.game.cache.audio.exists(key)) {
+    if (!this.audioConsent || !this.preferences.effects || !this.game.cache.audio.exists(key)) {
       return;
     }
 

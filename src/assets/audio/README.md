@@ -11,9 +11,12 @@ Guarda en `music/`:
 - `loading-theme.wav` o `loading-theme.mp3`: tema exclusivo de la pantalla de carga.
 - `menu-theme.wav` o `menu-theme.mp3`: tema del menú, preparado para repetirse en bucle.
 - `game-theme.wav` o `game-theme.mp3`: tema de juego, preparado para repetirse en bucle.
+- `water-ambient.wav`: música ambiental para niveles de océano, río y cataratas.
+- `forest-ambient.wav`: música ambiental para niveles de selva y bosque.
+- `space-ambient.wav`: música ambiental para niveles espaciales, robóticos y de cristales.
 
 El tema de carga de ejemplo dura 12 segundos; los otros temas de ejemplo duran
-16 segundos. Todos son loops originales.
+16 segundos; cada tema ambiental nuevo dura 8 segundos. Todos son loops originales.
 Para versiones más largas, usa 45–90 segundos para el menú y 60–120 para el juego.
 Formato recomendado para reemplazos: MP3, 44.1 kHz, estéreo, 128–192 kbps.
 Si dejas ambos formatos, se elige el MP3.
@@ -29,6 +32,12 @@ Guarda en `sfx/`:
 - `collision.wav`: choque suave, 0.3–1.2 segundos.
 - `night-bird.wav`: llamada nocturna original que suena al pasar murciélagos y criaturas nocturnas,
   aproximadamente 1 segundo.
+- `splash.wav`: chapuzón corto para corrientes y caídas.
+- `electric.wav`: descarga caricaturesca para plataformas eléctricas.
+- `animal-call.wav`: llamada breve al cruzarse con un animal.
+- `unlock.wav`: fanfarria corta al desbloquear una vestimenta.
+- `victory.wav`: melodía alegre al completar una pista.
+- `oops.wav`: efecto suave al perder una carrera.
 
 Formato recomendado: WAV PCM, 16 bits, mono, 44.1 kHz. Recorta el silencio
 al principio y final de cada efecto.
@@ -37,4 +46,5 @@ Después de copiar los archivos, reinicia o recarga el juego. La música se
 reproduce en bucle; el control de carga y el botón de configuración activan o
 silencian la música, y los efectos se controlan por separado. El clic ya está
 conectado a todos los botones. Los
-efectos de salto, moneda, estrella, choque y ave nocturna ya están conectados a sus eventos.
+efectos de salto, moneda, estrella, choque, ave nocturna, agua, electricidad, animales y vestimentas
+están conectados a sus eventos. Las pistas ambientales se eligen según el mundo del nivel.

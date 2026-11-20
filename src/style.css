@@ -43,9 +43,9 @@ body {
 
 .game-container {
   display: grid;
-  width: min(100vw, calc(100dvh * 16 / 9));
-  height: min(100dvh, calc(100vw * 9 / 16));
-  max-width: 100%;
+  width: min(100%, 177.7778dvh);
+  height: min(100%, 56.25vw);
+  aspect-ratio: 16 / 9;
   place-items: center;
   overflow: hidden;
   border: 0;
@@ -64,18 +64,95 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-@media (pointer: coarse) {
-  .app-shell {
-    padding: 0;
-    background: #a9e7ff;
-  }
+.start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 5vw, 36px);
+  overflow-y: auto;
+  background: rgb(40 19 79 / 64%);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
 
-  .game-container {
-    width: 100vw;
-    height: 100dvh;
-    max-width: none;
-    outline: 0;
-    border-radius: 0;
-    box-shadow: none;
-  }
+.start-screen[hidden] {
+  display: none;
+}
+
+.start-panel {
+  width: min(100%, 460px);
+  padding: clamp(22px, 5vw, 34px);
+  border: 4px solid #fff;
+  border-radius: 24px;
+  background: #fff9e9;
+  box-shadow: 0 20px 60px rgb(22 11 43 / 35%);
+  text-align: center;
+}
+
+.start-panel h1 {
+  margin: 0 0 12px;
+  color: #5528a8;
+  font-size: clamp(28px, 7vw, 40px);
+}
+
+.start-panel p {
+  margin: 0 0 20px;
+  color: #3e6380;
+  line-height: 1.5;
+}
+
+.start-options {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 22px;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.start-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #28134f;
+  line-height: 1.4;
+}
+
+#display-option[hidden] {
+  display: none;
+}
+
+.start-option input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  accent-color: #6f50d7;
+}
+
+.start-button {
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 16px;
+  background: #f07832;
+  box-shadow: 0 5px 0 #b74f1b;
+  color: #fff;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.start-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #b74f1b;
+}
+
+.start-button:focus-visible,
+.start-option input:focus-visible {
+  outline: 3px solid #5528a8;
+  outline-offset: 3px;
 }

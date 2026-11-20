@@ -4,6 +4,7 @@ import createMenuButton from '../ui/createMenuButton.js';
 import createStageControl from '../ui/createStageControl.js';
 import drawStageBackground from '../ui/drawStageBackground.js';
 import { getSelectedCharacter } from '../systems/CharacterPreferences.js';
+import { getSelectedOutfit } from '../systems/OutfitPreferences.js';
 import { calculateStageStars, getStageConfig } from './stages/stageConfigs.js';
 
 const PLAYER_X = 155;
@@ -11,6 +12,22 @@ const PLAYER_WIDTH = 36;
 const PLAYER_HEIGHT = 54;
 const CROUCH_HEIGHT = 30;
 const COIN_RADIUS = 12;
+const WATER_THEMES = new Set(['ocean', 'deep-ocean', 'river', 'waterfall']);
+const FOREST_THEMES = new Set(['jungle', 'autumn', 'meadow', 'tropical']);
+const SPACE_THEMES = new Set(['space', 'planet', 'moon', 'galaxy', 'robot', 'crystal']);
+
+function getStageMusicKey(theme) {
+  if (WATER_THEMES.has(theme)) {
+    return 'waterMusic';
+  }
+  if (FOREST_THEMES.has(theme)) {
+    return 'forestMusic';
+  }
+  if (SPACE_THEMES.has(theme)) {
+    return 'spaceMusic';
+  }
+  return 'gameMusic';
+}
 
 export default class StageScene extends Phaser.Scene {
   constructor() {
@@ -21,7 +38,7 @@ export default class StageScene extends Phaser.Scene {
     this.stageConfig = getStageConfig(data.levelId);
     this.levelId = this.stageConfig.id;
     this.audio = this.registry.get('audioManager');
-    this.audio.playMusic('gameMusic');
+    this.audio.playMusic(getStageMusicKey(this.stageConfig.theme));
     this.background = drawStageBackground(this, this.stageConfig);
     this.worldDistance = 0;
     this.playerFeetY = this.stageConfig.floorY;
@@ -63,6 +80,7 @@ export default class StageScene extends Phaser.Scene {
       this.stageConfig.floorY - 30,
       0.58,
       false,
+      getSelectedOutfit(),
     ).setDepth(10);
     this.playerShield = this.add.graphics().setDepth(11);
 
@@ -267,8 +285,8 @@ export default class StageScene extends Phaser.Scene {
       this.playerFeetY += this.playerVelocityY * seconds;
       if (this.isFalling && this.playerFeetY > this.stageConfig.floorY + 50) {
         this.hits += 1;
-        this.audio.playSfx('collision');
-        this.finishLevel(false);
+        this.audio.playSfx('splash');
+        this.finishLevel(false, 'gap');
         return;
       }
 
@@ -372,8 +390,12 @@ export default class StageScene extends Phaser.Scene {
     }
 
     const graphics = this.add.graphics();
-    if (event.type === 'bird') {
-      this.drawFlyingHazard(graphics, event.variant);
+    if (event.type === 'bird' || event.type === 'animal') {
+      if (event.type === 'animal') {
+        this.drawAnimalHazard(graphics, event.variant);
+      } else {
+        this.drawFlyingHazard(graphics, event.variant);
+      }
       graphics.setDepth(8).setVisible(false);
       return {
         event,
@@ -459,7 +481,22 @@ export default class StageScene extends Phaser.Scene {
       return { event, object: graphics };
     }
 
-    if (event.kind === 'overhead') {
+    if (event.type === 'platform') {
+      return this.createHazardPlatform(event, graphics);
+    }
+
+    if (event.kind === 'overhead' || event.kind === 'vine') {
+      if (event.kind === 'vine') {
+        graphics.fillStyle(0x347e50);
+        graphics.fillRoundedRect(-39, this.stageConfig.floorY - 83, 78, 20, 9);
+        graphics.lineStyle(5, 0x7ccf69);
+        graphics.beginPath();
+        graphics.moveTo(-26, this.stageConfig.floorY - 63);
+        graphics.lineTo(-26, this.stageConfig.floorY - 32);
+        graphics.moveTo(20, this.stageConfig.floorY - 63);
+        graphics.lineTo(20, this.stageConfig.floorY - 32);
+        graphics.strokePath();
+      } else {
       graphics.fillStyle(0x664a9f);
       graphics.fillRoundedRect(-39, this.stageConfig.floorY - 83, 78, 20, 9);
       graphics.fillStyle(0x9a74d9);
@@ -469,11 +506,29 @@ export default class StageScene extends Phaser.Scene {
       graphics.fillStyle(0x6ebc5c);
       graphics.fillCircle(-28, this.stageConfig.floorY - 83, 8);
       graphics.fillCircle(25, this.stageConfig.floorY - 84, 9);
+      }
       graphics.setDepth(4);
       return { event, object: graphics, width: 76, top: this.stageConfig.floorY - 83, bottom: this.stageConfig.floorY - 33 };
     }
 
-    if (event.kind === 'icicle' || event.kind === 'laser') {
+    if (event.kind === 'icicle' || event.kind === 'laser' || event.kind === 'fan') {
+      if (event.kind === 'fan') {
+        graphics.fillStyle(0x465b86);
+        graphics.fillRoundedRect(-42, this.stageConfig.floorY - 48, 84, 46, 8);
+        graphics.fillStyle(0xa9d8ff);
+        graphics.fillCircle(0, this.stageConfig.floorY - 26, 19);
+        graphics.lineStyle(5, 0x496a9a);
+        graphics.beginPath();
+        graphics.moveTo(0, this.stageConfig.floorY - 26);
+        graphics.lineTo(-11, this.stageConfig.floorY - 39);
+        graphics.moveTo(0, this.stageConfig.floorY - 26);
+        graphics.lineTo(14, this.stageConfig.floorY - 27);
+        graphics.moveTo(0, this.stageConfig.floorY - 26);
+        graphics.lineTo(-2, this.stageConfig.floorY - 10);
+        graphics.strokePath();
+        graphics.setDepth(6);
+        return { event, object: graphics, width: 74, top: this.stageConfig.floorY - 48, bottom: this.stageConfig.floorY };
+      }
       const laser = event.kind === 'laser';
       graphics.fillStyle(laser ? 0x7d76ff : 0x81dff4);
       graphics.fillRoundedRect(-42, this.stageConfig.floorY - 82, 84, 15, 7);
@@ -491,24 +546,72 @@ export default class StageScene extends Phaser.Scene {
       };
     }
 
-    if (event.kind === 'rock') {
-      graphics.fillStyle(0x596a84);
+    if (event.kind === 'rock' || event.kind === 'lava-rock') {
+      const lavaRock = event.kind === 'lava-rock';
+      graphics.fillStyle(lavaRock ? 0x593e4b : 0x596a84);
       graphics.fillTriangle(-36, this.stageConfig.floorY, -27, this.stageConfig.floorY - 35, -4, this.stageConfig.floorY - 45);
       graphics.fillTriangle(-27, this.stageConfig.floorY - 35, 18, this.stageConfig.floorY - 43, 35, this.stageConfig.floorY);
-      graphics.fillStyle(0x9aaec8);
+      graphics.fillStyle(lavaRock ? 0xff9a52 : 0x9aaec8);
       graphics.fillTriangle(-23, this.stageConfig.floorY - 33, -4, this.stageConfig.floorY - 45, 7, this.stageConfig.floorY - 34);
       graphics.setDepth(6);
       return { event, object: graphics, width: 66, top: this.stageConfig.floorY - 45, bottom: this.stageConfig.floorY };
     }
 
-    if (event.kind === 'spikes') {
-      graphics.fillStyle(0xf07832);
-      for (let spike = 0; spike < 3; spike += 1) {
-        const x = -30 + spike * 22;
-        graphics.fillTriangle(x, this.stageConfig.floorY, x + 11, this.stageConfig.floorY - 38, x + 22, this.stageConfig.floorY);
+    if (event.kind === 'spikes' || event.kind === 'cactus') {
+      graphics.fillStyle(event.kind === 'cactus' ? 0x38985a : 0xf07832);
+      if (event.kind === 'cactus') {
+        graphics.fillRoundedRect(-11, this.stageConfig.floorY - 68, 22, 68, 10);
+        graphics.fillRoundedRect(-29, this.stageConfig.floorY - 47, 19, 12, 6);
+        graphics.fillRoundedRect(-29, this.stageConfig.floorY - 56, 10, 21, 6);
+        graphics.fillRoundedRect(10, this.stageConfig.floorY - 35, 20, 12, 6);
+        graphics.fillRoundedRect(20, this.stageConfig.floorY - 47, 10, 24, 6);
+      } else {
+        for (let spike = 0; spike < 3; spike += 1) {
+          const x = -30 + spike * 22;
+          graphics.fillTriangle(x, this.stageConfig.floorY, x + 11, this.stageConfig.floorY - 38, x + 22, this.stageConfig.floorY);
+        }
       }
       graphics.setDepth(6);
-      return { event, object: graphics, width: 66, top: this.stageConfig.floorY - 38, bottom: this.stageConfig.floorY };
+      return {
+        event,
+        object: graphics,
+        width: event.kind === 'cactus' ? 58 : 66,
+        top: this.stageConfig.floorY - (event.kind === 'cactus' ? 68 : 38),
+        bottom: this.stageConfig.floorY,
+      };
+    }
+
+    if (event.kind === 'waterfall' || event.kind === 'geyser') {
+      const geyser = event.kind === 'geyser';
+      graphics.fillStyle(geyser ? 0xff8d48 : 0x62e1f3, 0.9);
+      graphics.fillRoundedRect(-24, this.stageConfig.floorY - 78, 48, 78, 12);
+      graphics.fillStyle(geyser ? 0xffdd76 : 0xe9ffff, 0.9);
+      graphics.fillEllipse(0, this.stageConfig.floorY - 76, 48, 17);
+      graphics.fillCircle(-10, this.stageConfig.floorY - 88, 6);
+      graphics.fillCircle(8, this.stageConfig.floorY - 93, 5);
+      graphics.setDepth(6);
+      return { event, object: graphics, width: 48, top: this.stageConfig.floorY - 88, bottom: this.stageConfig.floorY };
+    }
+
+    if (event.kind === 'windmill') {
+      graphics.fillStyle(0x8b5a48);
+      graphics.fillRoundedRect(-6, this.stageConfig.floorY - 74, 12, 74, 5);
+      graphics.fillStyle(0xf58a54);
+      graphics.fillTriangle(0, this.stageConfig.floorY - 74, -12, this.stageConfig.floorY - 107, 12, this.stageConfig.floorY - 107);
+      graphics.fillTriangle(0, this.stageConfig.floorY - 74, -33, this.stageConfig.floorY - 61, -33, this.stageConfig.floorY - 86);
+      graphics.fillTriangle(0, this.stageConfig.floorY - 74, 12, this.stageConfig.floorY - 41, -12, this.stageConfig.floorY - 41);
+      graphics.fillTriangle(0, this.stageConfig.floorY - 74, 33, this.stageConfig.floorY - 61, 33, this.stageConfig.floorY - 86);
+      graphics.setDepth(6);
+      return { event, object: graphics, width: 64, top: this.stageConfig.floorY - 107, bottom: this.stageConfig.floorY };
+    }
+
+    if (event.kind === 'crystal') {
+      graphics.fillStyle(0x9cecff);
+      graphics.fillTriangle(-34, this.stageConfig.floorY, 0, this.stageConfig.floorY - 76, 34, this.stageConfig.floorY);
+      graphics.fillStyle(0xffffff, 0.82);
+      graphics.fillTriangle(-5, this.stageConfig.floorY - 16, 0, this.stageConfig.floorY - 76, 8, this.stageConfig.floorY - 14);
+      graphics.setDepth(6);
+      return { event, object: graphics, width: 64, top: this.stageConfig.floorY - 76, bottom: this.stageConfig.floorY };
     }
 
     if (event.kind === 'wave') {
@@ -565,10 +668,61 @@ export default class StageScene extends Phaser.Scene {
     return { event, object: graphics, width: 62, top: this.stageConfig.floorY - 48, bottom: this.stageConfig.floorY };
   }
 
+  createHazardPlatform(event, graphics) {
+    const palette = {
+      water: { base: 0x237eb6, top: 0x8ef0fa, detail: 0xffffff },
+      electric: { base: 0x454577, top: 0xe4e66f, detail: 0xffffff },
+      lava: { base: 0x633743, top: 0xff754f, detail: 0xffd66e },
+      meteor: { base: 0x4d426e, top: 0xff9958, detail: 0xffdb77 },
+      thorn: { base: 0x34784d, top: 0x9add69, detail: 0xe9ffab },
+      cloud: { base: 0x677eac, top: 0xc4e6ff, detail: 0xffffff },
+      crystal: { base: 0x594a91, top: 0x9cecff, detail: 0xffffff },
+    };
+    const colors = palette[event.kind] ?? palette.electric;
+    const width = event.width ?? 112;
+    const height = event.height ?? 34;
+    const top = this.stageConfig.floorY - height;
+
+    graphics.fillStyle(0x30264a, 0.25);
+    graphics.fillRoundedRect(-width / 2, top + 5, width, height, 8);
+    graphics.fillStyle(colors.base);
+    graphics.fillRoundedRect(-width / 2, top, width, height, 8);
+    graphics.fillStyle(colors.top);
+    graphics.fillRoundedRect(-width / 2 + 5, top + 3, width - 10, 9, 5);
+
+    if (event.kind === 'electric' || event.kind === 'cloud') {
+      graphics.lineStyle(4, colors.detail, 0.95);
+      graphics.beginPath();
+      graphics.moveTo(-13, top + 12);
+      graphics.lineTo(-4, top + 20);
+      graphics.lineTo(-10, top + 27);
+      graphics.lineTo(10, top + 18);
+      graphics.strokePath();
+    } else if (event.kind === 'thorn' || event.kind === 'crystal') {
+      graphics.fillStyle(colors.detail);
+      for (let point = -width / 2 + 14; point < width / 2 - 8; point += 24) {
+        graphics.fillTriangle(point - 7, top + 5, point, top - 8, point + 7, top + 5);
+      }
+    } else {
+      graphics.fillStyle(colors.detail, 0.9);
+      graphics.fillCircle(-width / 4, top + 21, 4);
+      graphics.fillCircle(width / 4, top + 22, 5);
+    }
+
+    graphics.setDepth(6);
+    return {
+      event,
+      object: graphics,
+      width,
+      top: top - (event.kind === 'thorn' || event.kind === 'crystal' ? 8 : 0),
+      bottom: this.stageConfig.floorY,
+    };
+  }
+
   updateEntities(seconds) {
     for (let index = this.entities.length - 1; index >= 0; index -= 1) {
       const entity = this.entities[index];
-      if (entity.event.type === 'bird') {
+      if (entity.event.type === 'bird' || entity.event.type === 'animal') {
         if (!entity.birdActive && this.worldDistance < entity.event.distance) {
           continue;
         }
@@ -580,18 +734,18 @@ export default class StageScene extends Phaser.Scene {
         entity.birdAge += seconds;
         const previousBirdX = entity.birdX;
         entity.birdX += entity.event.speed * seconds;
-        const birdY = entity.event.y + Math.sin(entity.birdAge * 8) * 9;
-        entity.object.setPosition(entity.birdX, birdY);
-        if (
-          entity.event.nightSound
-          && previousBirdX < PLAYER_X
-          && entity.birdX >= PLAYER_X
-        ) {
-          this.audio.playSfx('nightBird', 0.45);
+        const hazardY = entity.event.y + Math.sin(entity.birdAge * 8) * 9;
+        entity.object.setPosition(entity.birdX, hazardY);
+        if (previousBirdX < PLAYER_X && entity.birdX >= PLAYER_X) {
+          if (entity.event.type === 'animal') {
+            this.audio.playSfx('animalCall', 0.45);
+          } else if (entity.event.nightSound) {
+            this.audio.playSfx('nightBird', 0.45);
+          }
         }
 
-        if (this.playerHitsBird(entity.birdX, birdY)) {
-          if (this.handleHazardHit()) {
+        if (this.playerHitsBird(entity.birdX, hazardY)) {
+          if (this.handleHazardHit(entity.event)) {
             return;
           }
           entity.object.destroy();
@@ -625,9 +779,9 @@ export default class StageScene extends Phaser.Scene {
           this.entities.splice(index, 1);
           continue;
         }
-      } else if (entity.event.type === 'obstacle') {
+      } else if (entity.event.type === 'obstacle' || entity.event.type === 'platform') {
         if (this.playerHitsObstacle(entity, x)) {
-          if (this.handleHazardHit()) {
+          if (this.handleHazardHit(entity.event)) {
             return;
           }
           entity.object.destroy();
@@ -667,6 +821,221 @@ export default class StageScene extends Phaser.Scene {
       && this.playerBounds.bottom > y - halfHeight;
   }
 
+  drawAnimalHazard(graphics, variant) {
+    if (variant === 'bat' || variant === 'alien') {
+      this.drawFlyingHazard(graphics, variant);
+      return;
+    }
+
+    if (variant === 'fish' || variant === 'shark' || variant === 'dolphin' || variant === 'turtle' || variant === 'whale') {
+      const aquaticColors = {
+        fish: { body: 0xffae55, fin: 0xff6d82 },
+        shark: { body: 0x729cc5, fin: 0x456b98 },
+        dolphin: { body: 0x72d9e8, fin: 0x3da9c3 },
+        turtle: { body: 0x63b96f, fin: 0x3b8b65 },
+        whale: { body: 0x597cbb, fin: 0x3b588f },
+      };
+      const colors = aquaticColors[variant];
+      graphics.fillStyle(colors.fin);
+      graphics.fillTriangle(-22, 0, -39, -15, -37, 15);
+      graphics.fillEllipse(-1, 0, 49, 29);
+      graphics.fillStyle(colors.body);
+      graphics.fillEllipse(2, -3, 42, 22);
+      graphics.fillStyle(0xffffff);
+      graphics.fillCircle(12, -6, 4);
+      graphics.fillStyle(0x30264a);
+      graphics.fillCircle(13, -6, 2);
+
+      if (variant === 'shark') {
+        graphics.fillStyle(colors.fin);
+        graphics.fillTriangle(-5, -12, 4, -30, 12, -12);
+        graphics.fillStyle(0xffffff);
+        graphics.fillTriangle(16, 5, 23, 8, 17, 11);
+      } else if (variant === 'dolphin' || variant === 'whale') {
+        graphics.fillStyle(colors.fin);
+        graphics.fillTriangle(16, 0, 36, 5, 20, 10);
+        graphics.fillTriangle(-7, -13, 0, -24, 6, -12);
+      } else if (variant === 'turtle') {
+        graphics.fillStyle(0x8c6b3f);
+        graphics.fillEllipse(-3, 0, 27, 24);
+        graphics.fillStyle(colors.body);
+        graphics.fillEllipse(-4, 1, 18, 15);
+        graphics.fillStyle(colors.fin);
+        graphics.fillEllipse(-13, 14, 14, 7);
+        graphics.fillEllipse(4, 14, 14, 7);
+      }
+      return;
+    }
+
+    if (variant === 'jellyfish') {
+      graphics.fillStyle(0xff9ed5, 0.9);
+      graphics.fillEllipse(0, -5, 44, 34);
+      graphics.fillStyle(0xffd5ec, 0.9);
+      graphics.fillEllipse(-8, -9, 10, 12);
+      graphics.lineStyle(4, 0xe875c2);
+      for (let tentacle = -2; tentacle <= 2; tentacle += 1) {
+        graphics.beginPath();
+        graphics.moveTo(tentacle * 8, 8);
+        graphics.lineTo(tentacle * 8 + 4, 22);
+        graphics.strokePath();
+      }
+      graphics.fillStyle(0x402c64);
+      graphics.fillCircle(-8, 0, 2);
+      graphics.fillCircle(8, 0, 2);
+      return;
+    }
+
+    if (variant === 'frog') {
+      graphics.fillStyle(0x57b963);
+      graphics.fillEllipse(0, 6, 44, 28);
+      graphics.fillCircle(-13, -7, 9);
+      graphics.fillCircle(13, -7, 9);
+      graphics.fillStyle(0xffffff);
+      graphics.fillCircle(-13, -8, 5);
+      graphics.fillCircle(13, -8, 5);
+      graphics.fillStyle(0x30264a);
+      graphics.fillCircle(-13, -8, 2);
+      graphics.fillCircle(13, -8, 2);
+      graphics.lineStyle(3, 0x267748);
+      graphics.beginPath();
+      graphics.arc(0, 5, 12, 0.2, Math.PI - 0.2);
+      graphics.strokePath();
+      return;
+    }
+
+    if (variant === 'crocodile') {
+      graphics.fillStyle(0x4ca65c);
+      graphics.fillEllipse(-2, 0, 37, 24);
+      graphics.fillTriangle(-17, 1, -40, -8, -32, 12);
+      graphics.fillStyle(0x77ca68);
+      graphics.fillRoundedRect(7, -7, 29, 15, 6);
+      graphics.fillStyle(0xffffff);
+      graphics.fillTriangle(12, 7, 17, 7, 14, 12);
+      graphics.fillTriangle(24, 7, 29, 7, 26, 12);
+      graphics.fillStyle(0x30264a);
+      graphics.fillCircle(11, -7, 3);
+      graphics.fillStyle(0xf5c85a);
+      graphics.fillEllipse(-6, 13, 12, 6);
+      return;
+    }
+
+    if (variant === 'otter') {
+      graphics.fillStyle(0x98664d);
+      graphics.fillEllipse(-1, 2, 39, 27);
+      graphics.fillStyle(0xd7b28a);
+      graphics.fillEllipse(12, 4, 19, 16);
+      graphics.fillCircle(-15, -12, 8);
+      graphics.fillCircle(5, -12, 8);
+      graphics.fillStyle(0xfff3df);
+      graphics.fillCircle(-15, -12, 4);
+      graphics.fillCircle(5, -12, 4);
+      graphics.fillStyle(0x30264a);
+      graphics.fillCircle(-14, -12, 2);
+      graphics.fillCircle(6, -12, 2);
+      graphics.fillStyle(0x47343c);
+      graphics.fillEllipse(16, 1, 7, 5);
+      graphics.lineStyle(4, 0x98664d);
+      graphics.beginPath();
+      graphics.arc(-19, 0, 15, Math.PI / 2, Math.PI * 1.5);
+      graphics.strokePath();
+      return;
+    }
+
+    if (variant === 'monkey' || variant === 'fox' || variant === 'scorpion' || variant === 'penguin') {
+      const animalColors = {
+        monkey: { body: 0x9a6544, face: 0xf5d19c },
+        fox: { body: 0xef8949, face: 0xffe6bd },
+        scorpion: { body: 0xc36a4a, face: 0xf6c466 },
+        penguin: { body: 0x465b86, face: 0xf6f6ff },
+      };
+      const colors = animalColors[variant];
+      graphics.fillStyle(colors.body);
+      graphics.fillEllipse(-2, 1, 36, 29);
+      graphics.fillStyle(colors.face);
+      graphics.fillEllipse(8, 2, 19, 17);
+      graphics.fillStyle(0xffffff);
+      graphics.fillCircle(5, -9, 7);
+      graphics.fillStyle(0x30264a);
+      graphics.fillCircle(7, -10, 3);
+      if (variant === 'monkey') {
+        graphics.lineStyle(5, colors.body);
+        graphics.beginPath();
+        graphics.arc(-12, -10, 14, Math.PI / 2, Math.PI * 1.8);
+        graphics.strokePath();
+      } else if (variant === 'fox') {
+        graphics.fillStyle(colors.body);
+        graphics.fillTriangle(-14, -8, -11, -28, 1, -12);
+        graphics.fillTriangle(5, -12, 18, -28, 20, -5);
+      } else if (variant === 'scorpion') {
+        graphics.lineStyle(5, colors.body);
+        graphics.beginPath();
+        graphics.arc(-19, -10, 17, Math.PI, Math.PI * 1.7);
+        graphics.strokePath();
+        graphics.fillStyle(0xf6c466);
+        graphics.fillCircle(-31, -23, 5);
+      } else {
+        graphics.fillTriangle(17, 1, 30, 6, 17, 10);
+      }
+      return;
+    }
+
+    if (variant === 'robot') {
+      graphics.fillStyle(0x68c8cf);
+      graphics.fillRoundedRect(-21, -19, 42, 38, 9);
+      graphics.lineStyle(3, 0x367b9b);
+      graphics.strokeRoundedRect(-21, -19, 42, 38, 9);
+      graphics.fillStyle(0xfff18b);
+      graphics.fillCircle(-9, -5, 5);
+      graphics.fillCircle(9, -5, 5);
+      graphics.fillStyle(0x3a587c);
+      graphics.fillRoundedRect(-8, 7, 16, 4, 2);
+      graphics.lineStyle(3, 0xaaf2e5);
+      graphics.beginPath();
+      graphics.moveTo(0, -19);
+      graphics.lineTo(0, -28);
+      graphics.strokePath();
+      graphics.fillCircle(0, -30, 4);
+      return;
+    }
+
+    if (variant === 'butterfly') {
+      graphics.fillStyle(0xff86bf);
+      graphics.fillEllipse(-14, -5, 23, 29);
+      graphics.fillEllipse(14, -5, 23, 29);
+      graphics.fillStyle(0x7f6ce5);
+      graphics.fillEllipse(-13, 10, 18, 20);
+      graphics.fillEllipse(13, 10, 18, 20);
+      graphics.fillStyle(0x684433);
+      graphics.fillRoundedRect(-3, -17, 6, 35, 3);
+      graphics.lineStyle(2, 0x684433);
+      graphics.beginPath();
+      graphics.moveTo(-2, -15);
+      graphics.lineTo(-8, -25);
+      graphics.moveTo(2, -15);
+      graphics.lineTo(8, -25);
+      graphics.strokePath();
+      return;
+    }
+
+    if (variant === 'dragon') {
+      graphics.fillStyle(0x67bd73);
+      graphics.fillEllipse(0, 3, 41, 28);
+      graphics.fillStyle(0x9fdf83);
+      graphics.fillCircle(10, -8, 15);
+      graphics.fillStyle(0x5c9d5b);
+      graphics.fillTriangle(-4, -2, -32, -25, -24, 11);
+      graphics.fillTriangle(2, -1, 31, -26, 25, 12);
+      graphics.fillStyle(0xffe27a);
+      graphics.fillTriangle(4, -18, 7, -30, 12, -16);
+      graphics.fillTriangle(15, -17, 22, -28, 22, -13);
+      graphics.fillStyle(0x30264a);
+      graphics.fillCircle(14, -10, 2);
+      return;
+    }
+
+    this.drawFlyingHazard(graphics, 'bird');
+  }
+
   drawFlyingHazard(graphics, variant = 'bird') {
     if (variant === 'meteor') {
       graphics.fillStyle(0xf07832, 0.72);
@@ -704,16 +1073,42 @@ export default class StageScene extends Phaser.Scene {
     }
   }
 
-  handleHazardHit() {
+  handleHazardHit(event) {
     this.hits += 1;
-    this.audio.playSfx('collision');
+    let deathCause = 'obstacle';
+    let soundKey = 'collision';
+
+    if (event.type === 'gap') {
+      deathCause = 'gap';
+      soundKey = 'splash';
+    } else if (event.type === 'animal') {
+      deathCause = 'animal';
+      soundKey = 'animalCall';
+    } else if (event.type === 'bird') {
+      deathCause = 'bird';
+    } else {
+      const kind = event.kind;
+      if (kind === 'water' || kind === 'wave' || kind === 'waterfall') {
+        deathCause = 'water';
+        soundKey = 'splash';
+      } else if (kind === 'lava' || kind === 'lava-rock' || kind === 'geyser' || kind === 'meteor') {
+        deathCause = 'lava';
+      } else if (kind === 'electric' || kind === 'laser' || kind === 'fan' || kind === 'cloud') {
+        deathCause = 'electric';
+        soundKey = 'electric';
+      } else if (event.type === 'platform') {
+        deathCause = 'platform';
+      }
+    }
+
+    this.audio.playSfx(soundKey);
     if (this.shieldRemaining > 0) {
       this.shieldRemaining = 0;
       this.showPowerMessage('¡ESCUDO PROTEGIÓ!');
       return false;
     }
 
-    this.finishLevel(false);
+    this.finishLevel(false, deathCause);
     return true;
   }
 
@@ -791,7 +1186,7 @@ export default class StageScene extends Phaser.Scene {
     this.jumpEnergyBar.fillRoundedRect(206, 120, 134 * energy, 8, 4);
   }
 
-  finishLevel(completed) {
+  finishLevel(completed, deathCause = 'obstacle') {
     if (this.hasEnded) {
       return;
     }
@@ -808,6 +1203,7 @@ export default class StageScene extends Phaser.Scene {
       levelId: this.stageConfig.id,
       stageName: this.stageConfig.name,
       outcome: completed ? 'victory' : 'defeat',
+      deathCause,
       score: Math.floor(this.scoreFraction),
       distance,
       elapsedSeconds: Math.floor(distance / this.stageConfig.speed),

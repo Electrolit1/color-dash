@@ -2,6 +2,7 @@ export const CHARACTER_OPTIONS = [
   { id: 'cat', label: 'GATO' },
   { id: 'dog', label: 'PERRO' },
   { id: 'rabbit', label: 'CONEJO' },
+  { id: 'panda', label: 'PANDA' },
 ];
 
 const STORAGE_KEY = 'colorDashSelectedCharacter';
